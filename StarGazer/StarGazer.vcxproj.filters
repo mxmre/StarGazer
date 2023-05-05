@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{e7a9af01-21a2-4b53-963b-615504ee7783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\headers">
+      <UniqueIdentifier>{852cf2db-13a2-44d8-b7c2-d9f0ee8caeb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\cpp">
+      <UniqueIdentifier>{9bc71f4c-ab8f-41b3-8288-b0b4ce95707b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{d1f0bf4a-65ef-4dad-8357-eb13f159f33f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions\headers">
+      <UniqueIdentifier>{340c1e47-f279-480c-aef2-4aa58bb94e19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions\cpp">
+      <UniqueIdentifier>{2995372e-f46e-40aa-ba74-09bcc1a93a1f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Utility\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTime.cpp">
+      <Filter>Utility\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="SGException.cpp">
+      <Filter>Exceptions\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Asserts.cpp">
+      <Filter>Exceptions\cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DateTime.h">
+      <Filter>Utility\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Asserts.h">
+      <Filter>Exceptions\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SGException.h">
+      <Filter>Exceptions\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
