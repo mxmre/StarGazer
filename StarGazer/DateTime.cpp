@@ -151,19 +151,6 @@ bool DateTime::IsCorrectDate(const DateTime& time)
 	return DateTime::IsCorrectDate(time._hours, time._mins, time._secs, time._year, time._month, time._mday);
 }
 
-const std::string DateTime::NumberToZeroString(uint32_t num, uint32_t zero_cnt)
-{
-	std::string result(zero_cnt, '0'), number_str = std::to_string(num);
-	sg::exceptions::ErrorAssert(zero_cnt >= number_str.size(), DEBUG_MSG("Wrong number size"));
-	for (size_t i = number_str.size() - 1;; --i)
-	{
-		result[i + zero_cnt - number_str.size()] = number_str[i];
-		if (i == 0)
-			break;
-	}
-	return result;
-}
-
 uint32_t DateTime::DaysInMonth(const uint32_t month, const uint32_t year)
 {
 	static const uint8_t MONTH_DAYS[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -175,11 +162,23 @@ uint32_t DateTime::DaysInMonth(const uint32_t month, const uint32_t year)
 
 const std::string DateTime::ToString(const DateTime& time)
 {
-	return DateTime::NumberToZeroString(time._hours, 2) + ":"
-		+ DateTime::NumberToZeroString(time._mins, 2) + ":"
-		+ DateTime::NumberToZeroString(time._secs, 2) + " "
-		+ std::to_string(time._year) + "/" + DateTime::NumberToZeroString(time._month + 1, 2) + "/"
-		+ DateTime::NumberToZeroString(time._mday + 1, 2);
+	auto NumberToZeroString = [](uint32_t num, uint32_t zero_cnt)
+	{
+		std::string result(zero_cnt, '0'), number_str = std::to_string(num);
+		sg::exceptions::ErrorAssert(zero_cnt >= number_str.size(), DEBUG_MSG("Wrong number size"));
+		for (size_t i = number_str.size() - 1;; --i)
+		{
+			result[i + zero_cnt - number_str.size()] = number_str[i];
+			if (i == 0)
+				break;
+		}
+		return result;
+	};
+	return NumberToZeroString(time._hours, 2) + ":"
+		+ NumberToZeroString(time._mins, 2) + ":"
+		+ NumberToZeroString(time._secs, 2) + " "
+		+ std::to_string(time._year) + "/" + NumberToZeroString(time._month + 1, 2) + "/"
+		+ NumberToZeroString(time._mday + 1, 2);
 }
 
 const DateTime DateTime::FromString(const std::string& time)

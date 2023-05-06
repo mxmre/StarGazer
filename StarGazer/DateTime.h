@@ -32,7 +32,7 @@ namespace sg
 			bool IsLeapYear() const;
 			static bool IsLeapYear(const uint32_t year);
 			uint32_t DaysInCurrentMonth() const;
-			static uint32_t DaysInMonth(const uint32_t month, const uint32_t year);
+			
 
 			static const std::string ToString(const DateTime& time);
 			static const DateTime FromString(const std::string& time);
@@ -50,6 +50,7 @@ namespace sg
 				const uint32_t year, const uint32_t month, const uint32_t mday);
 			static bool IsCorrectDate(const DateTime& time);
 			static const std::string NumberToZeroString(uint32_t num, uint32_t zero_cnt);
+			static uint32_t DaysInMonth(const uint32_t month, const uint32_t year);
 		};
 	}
 }
