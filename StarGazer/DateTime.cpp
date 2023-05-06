@@ -10,12 +10,12 @@ void DateTime::SetDateTime(const uint32_t hours, const uint32_t mins, const uint
 	const uint32_t year, const uint32_t month, const uint32_t mday)
 {
 	sg::exceptions::ErrorAssert(DateTime::IsCorrectDate(hours, mins, secs, year, month, mday), DEBUG_MSG("Wrong datetime format"));
-	this->_hours = hours;
-	this->_secs = secs;
-	this->_mday = mday;
-	this->_mins = mins;
-	this->_month = month;
-	this->_year = year;
+	this->m_hours = hours;
+	this->m_secs = secs;
+	this->m_mday = mday;
+	this->m_mins = mins;
+	this->m_month = month;
+	this->m_year = year;
 }
 
 DateTime::DateTime(const std::string& time)
@@ -45,30 +45,30 @@ void DateTime::PassDateTime(const std::string& time)
 
 void DateTime::PassDateTime(const time_t secs, const time_t mins, const time_t hours, const time_t days)
 {
-	time_t tmp_secs = this->_secs + secs, tmp_mins = this->_mins + mins, tmp_hours = this->_hours + hours, tmp_days = days;
-	this->_secs = tmp_secs % 60; tmp_mins += tmp_secs / 60;
-	this->_mins = tmp_mins % 60; tmp_hours += tmp_mins / 60;
-	this->_hours = tmp_hours % 24; tmp_days += tmp_hours / 24;
+	time_t tmp_secs = this->m_secs + secs, tmp_mins = this->m_mins + mins, tmp_hours = this->m_hours + hours, tmp_days = days;
+	this->m_secs = tmp_secs % 60; tmp_mins += tmp_secs / 60;
+	this->m_mins = tmp_mins % 60; tmp_hours += tmp_mins / 60;
+	this->m_hours = tmp_hours % 24; tmp_days += tmp_hours / 24;
 
 	while (true)
 	{
-		time_t available_number_of_days_to_add = this->DaysInCurrentMonth() - this->_mday;
+		time_t available_number_of_days_to_add = this->DaysInCurrentMonth() - this->m_mday;
 
 		if (available_number_of_days_to_add >= tmp_days)
 		{
-			this->_mday += tmp_days;
+			this->m_mday += static_cast<uint32_t>(tmp_days);
 			break;
 		}
 		else
 		{
 			tmp_days -= available_number_of_days_to_add;
-			if (this->_month + 1 == 12)
+			if (this->m_month + 1 == 12)
 			{
-				this->_month = 0;
-				++this->_year;
+				this->m_month = 0;
+				++this->m_year;
 			}
-			else ++this->_month;
-			this->_mday = 0;
+			else ++this->m_month;
+			this->m_mday = 0;
 		}
 
 
@@ -77,26 +77,26 @@ void DateTime::PassDateTime(const time_t secs, const time_t mins, const time_t h
 
 uint32_t DateTime::Year() const
 {
-	return this->_year + 1;
+	return this->m_year + 1;
 }
 
 uint32_t DateTime::Month() const
 {
-	return this->_month + 1;
+	return this->m_month + 1;
 }
 
 uint32_t DateTime::YearDay() const
 {
 	uint32_t ydays = 0;
-	for (uint32_t month = 0; month <= this->_month; ++month)
+	for (uint32_t month = 0; month <= this->m_month; ++month)
 	{
-		if ((month + 1) <= this->_month)
+		if ((month + 1) <= this->m_month)
 		{
-			ydays += DateTime::DaysInMonth(month, this->_year);
+			ydays += DateTime::DaysInMonth(month, this->m_year);
 		}
 		else
 		{
-			ydays += this->_mday + 1;
+			ydays += this->m_mday + 1;
 		}
 	}
 	return ydays;
@@ -104,22 +104,22 @@ uint32_t DateTime::YearDay() const
 
 uint32_t DateTime::MonthDay() const
 {
-	return this->_mday + 1;
+	return this->m_mday + 1;
 }
 
 uint32_t DateTime::Hour() const
 {
-	return this->_hours;
+	return this->m_hours;
 }
 
 uint32_t DateTime::Minute() const
 {
-	return this->_mins;
+	return this->m_mins;
 }
 
 uint32_t DateTime::Second() const
 {
-	return this->_secs;
+	return this->m_secs;
 }
 
 
@@ -127,7 +127,7 @@ uint32_t DateTime::Second() const
 
 bool DateTime::IsLeapYear() const
 {
-	return DateTime::IsLeapYear(this->_year);
+	return DateTime::IsLeapYear(this->m_year);
 }
 
 bool DateTime::IsLeapYear(const uint32_t year)
@@ -137,7 +137,7 @@ bool DateTime::IsLeapYear(const uint32_t year)
 
 uint32_t DateTime::DaysInCurrentMonth() const
 {
-	return DateTime::DaysInMonth(this->_month, this->_year);
+	return DateTime::DaysInMonth(this->m_month, this->m_year);
 }
 
 bool DateTime::IsCorrectDate(const uint32_t hours, const uint32_t mins, const uint32_t secs,
@@ -148,7 +148,7 @@ bool DateTime::IsCorrectDate(const uint32_t hours, const uint32_t mins, const ui
 
 bool DateTime::IsCorrectDate(const DateTime& time)
 {
-	return DateTime::IsCorrectDate(time._hours, time._mins, time._secs, time._year, time._month, time._mday);
+	return DateTime::IsCorrectDate(time.m_hours, time.m_mins, time.m_secs, time.m_year, time.m_month, time.m_mday);
 }
 
 uint32_t DateTime::DaysInMonth(const uint32_t month, const uint32_t year)
@@ -160,25 +160,40 @@ uint32_t DateTime::DaysInMonth(const uint32_t month, const uint32_t year)
 	return days;
 }
 
-const std::string DateTime::ToString(const DateTime& time)
+const std::string DateTime::DateTimeToString(const DateTime& time)
 {
-	auto NumberToZeroString = [](uint32_t num, uint32_t zero_cnt)
-	{
-		std::string result(zero_cnt, '0'), number_str = std::to_string(num);
-		sg::exceptions::ErrorAssert(zero_cnt >= number_str.size(), DEBUG_MSG("Wrong number size"));
-		for (size_t i = number_str.size() - 1;; --i)
-		{
-			result[i + zero_cnt - number_str.size()] = number_str[i];
-			if (i == 0)
-				break;
-		}
-		return result;
-	};
-	return NumberToZeroString(time._hours, 2) + ":"
-		+ NumberToZeroString(time._mins, 2) + ":"
-		+ NumberToZeroString(time._secs, 2) + " "
-		+ std::to_string(time._year) + "/" + NumberToZeroString(time._month + 1, 2) + "/"
-		+ NumberToZeroString(time._mday + 1, 2);
+	return DateTime::TimeToString(time) + " " + DateTime::DateToString(time);
+}
+
+const std::string DateTime::DateToString(const DateTime& time)
+{
+	std::ostringstream result;
+	result << std::setfill('0')
+		<< std::setw(2) << time.Year() << '/'
+		<< std::setw(2) << time.Month() << '/'
+		<< std::setfill(' ') << time.MonthDay();
+	return result.str();
+}
+const std::string DateTime::DateTimeToUniqueString(const DateTime& time)
+{
+	std::ostringstream stream;
+	stream << std::setfill('0')
+		<< std::setw(2) << time.Hour()
+		<< std::setw(2) << time.Minute()
+		<< std::setw(2) << time.Second()
+		<< std::setw(2) << time.Year()
+		<< std::setw(2) << time.Month()
+		<< std::setw(2) << time.MonthDay() << std::setfill(' ');
+	return stream.str();
+}
+const std::string DateTime::TimeToString(const DateTime& time)
+{
+	std::ostringstream result;
+	result << std::setfill('0')
+		<< std::setw(2) << time.Hour() << ':'
+		<< std::setw(2) << time.Minute() << ':'
+		<< std::setw(2) << time.Second() << std::setfill(' ');
+	return result.str();
 }
 
 const DateTime DateTime::FromString(const std::string& time)
@@ -188,16 +203,16 @@ const DateTime DateTime::FromString(const std::string& time)
 	sg::exceptions::ErrorAssert(std::regex_match(time, regex_expr), DEBUG_MSG("Wrong datetime format: [hh:mm:ss yyyy/mm/dd]"));
 	std::istringstream sinput(time);
 	DateTime result_time;
-	sinput >> result_time._hours; 
+	sinput >> result_time.m_hours; 
 	sinput.ignore(1); 
-	sinput >> result_time._mins; 
+	sinput >> result_time.m_mins; 
 	sinput.ignore(1); 
-	sinput >> result_time._secs >> result_time._year; 
+	sinput >> result_time.m_secs >> result_time.m_year; 
 	sinput.ignore(1); 
-	sinput >> result_time._month; 
+	sinput >> result_time.m_month; 
 	sinput.ignore(1); 
-	sinput >> result_time._mday;
-	--result_time._month; --result_time._mday;
+	sinput >> result_time.m_mday;
+	--result_time.m_month; --result_time.m_mday;
 	DateTime::IsCorrectDate(result_time);
 
 	return result_time;

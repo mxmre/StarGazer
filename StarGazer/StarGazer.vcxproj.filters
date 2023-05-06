@@ -19,11 +19,17 @@
     <Filter Include="Exceptions\cpp">
       <UniqueIdentifier>{2995372e-f46e-40aa-ba74-09bcc1a93a1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{014e54ee-affe-4412-8289-208b9c7ebad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\headers">
+      <UniqueIdentifier>{d9b29805-c030-46b8-a351-e6b023e81cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\cpp">
+      <UniqueIdentifier>{fd7c73bc-139e-4363-9f7e-99944f42495c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Utility\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="DateTime.cpp">
       <Filter>Utility\cpp</Filter>
     </ClCompile>
@@ -32,6 +38,15 @@
     </ClCompile>
     <ClCompile Include="Asserts.cpp">
       <Filter>Exceptions\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Core\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Crush.cpp">
+      <Filter>Exceptions\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ILogger.cpp">
+      <Filter>Utility\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +58,18 @@
     </ClInclude>
     <ClInclude Include="SGException.h">
       <Filter>Exceptions\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Utility\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SGFatalException.h">
+      <Filter>Exceptions\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Crush.h">
+      <Filter>Exceptions\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ILogger.h">
+      <Filter>Utility\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
