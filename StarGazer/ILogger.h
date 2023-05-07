@@ -19,14 +19,20 @@ namespace sg
 				Error
 			};
 
-			enum LogFlags : uint32_t
+			struct LogFlags
 			{
-				Null = 0,
-				Timed = 1
+				enum : uint32_t
+				{
+					Null = 0,
+					FileOutput = 1,
+					StdOutput = 2,
+					Timed = 4
+				};
 			};
+			
 
 			explicit ILogger(const LogType log_type = ILogger::LogType::DefaultMessage,
-				uint32_t logger_flags = ILogger::LogFlags::Timed);
+				uint32_t logger_flags = 0x7);
 		protected:
 			LogType m_log_type;
 			uint32_t m_flags;
