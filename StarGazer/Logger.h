@@ -47,7 +47,11 @@ namespace sg
 				}
 				//flags
 				if (this->m_flags & Logger::LogFlags::Timed)
-					msg = "[" + DateTime::DateTimeToString(DateTime::Now()) + "] " + msg;
+				{
+					std::string _time = "[" + DateTime::DateTimeToString(DateTime::Now()) + "] ";
+					msg = logger_string(_time.begin(), _time.end()) + msg;
+				}
+					
 
 				this->_RawPrint(msg);
 			}
