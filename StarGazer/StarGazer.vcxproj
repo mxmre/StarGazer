@@ -129,21 +129,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Asserts.cpp" />
     <ClCompile Include="Crush.cpp" />
     <ClCompile Include="DateTime.cpp" />
+    <ClCompile Include="EventQueue.cpp" />
     <ClCompile Include="ILogger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SGException.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Crush.h" />
     <ClInclude Include="DateTime.h" />
+    <ClInclude Include="EventQueue.h" />
+    <ClInclude Include="Events.h" />
     <ClInclude Include="ILogger.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="SGException.h" />
     <ClInclude Include="SGFatalException.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

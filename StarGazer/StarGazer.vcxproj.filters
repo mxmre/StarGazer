@@ -28,6 +28,24 @@
     <Filter Include="Core\cpp">
       <UniqueIdentifier>{fd7c73bc-139e-4363-9f7e-99944f42495c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{64da00f5-abb8-47a6-ba55-202a38dae3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\headers">
+      <UniqueIdentifier>{025b6baa-838c-4250-a8d4-642186ca9824}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\cpp">
+      <UniqueIdentifier>{f99f63d9-5a2a-4478-a8e0-128f692d67fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Event Control">
+      <UniqueIdentifier>{8d5d14ec-ccb5-4cfc-980f-77e656123240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Event Control\headers">
+      <UniqueIdentifier>{c4e0ef89-c68a-46f9-8339-c8666c0d84c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Event Control\cpp">
+      <UniqueIdentifier>{67bebe05-fd22-4069-8337-e73f5c076525}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DateTime.cpp">
@@ -47,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="ILogger.cpp">
       <Filter>Utility\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Core\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Core\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="EventQueue.cpp">
+      <Filter>Event Control\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +97,18 @@
     </ClInclude>
     <ClInclude Include="ILogger.h">
       <Filter>Utility\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.h">
+      <Filter>Event Control\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="EventQueue.h">
+      <Filter>Event Control\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

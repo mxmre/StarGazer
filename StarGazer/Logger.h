@@ -32,11 +32,11 @@ namespace sg
 			}
 			virtual void Print(lgstring msg)
 			{
-				if (!(this->m_flags & ILogger::LogFlags::StdOutput
-					&& this->m_flags & ILogger::LogFlags::FileOutput))
+				if (!(this->m_flags & ILogger::LogFlags::StdOutput)
+					&& !(this->m_flags & ILogger::LogFlags::FileOutput))
 				{
 					Logger<char> logger(Logger::LogType::Warning);
-					logger.Print("A try print message in unknown stream");
+					logger.Print("A try to print message in unknown stream");
 				}
 				else
 				{
@@ -70,7 +70,11 @@ namespace sg
 			}
 		private:
 			
-			void _StdOutputPrint(const lgstring& msg);
+			void _StdOutputPrint(const lgstring& msg)
+			{
+				std::wstring w_msg(msg.begin(), msg.end());
+				std::wcout << w_msg << std::endl;
+			}
 
 			void _RawPrint(const lgstring& msg)
 			{
@@ -89,28 +93,6 @@ namespace sg
 			
 			
 		};
-		void Logger<wchar_t>::_StdOutputPrint(const base_lgstring<wchar_t>& msg)
-		{
-			
-		}
-		void Logger<char>::_StdOutputPrint(const base_lgstring<char>& msg)
-		{
-			std::cout << msg << std::endl;
-		}
-		void Logger<char16_t>::_StdOutputPrint(const base_lgstring<char16_t>& msg)
-		{
-			
-			//ADD char32_t support;
-			// 
-			//not work
-			std::wstring w_msg(msg.begin(), msg.end());
-			std::wcout << w_msg << std::endl;
-		}
-		template<class _CharType>
-		void Logger<_CharType>::_StdOutputPrint(const base_lgstring<_CharType>& msg)
-		{
-			static_assert("Logger support only char, wchar_t, char16_t string types");
-		}
 	}
 }
 
