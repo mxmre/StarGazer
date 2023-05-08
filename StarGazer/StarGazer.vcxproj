@@ -129,6 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGame.cpp" />
+    <ClCompile Include="InputControl.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Asserts.cpp" />
     <ClCompile Include="Crush.cpp" />
@@ -140,6 +142,9 @@
     <ClCompile Include="WindowSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGame.h" />
+    <ClInclude Include="BasicMathTypes.h" />
+    <ClInclude Include="InputControl.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Crush.h" />

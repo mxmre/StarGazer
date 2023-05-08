@@ -1,12 +1,12 @@
 #include "SGException.h"
 
-sg::exceptions::SGException::SGException(const std::string& msg) :
+sg::exceptions::SGException::SGException(const std::wstring& msg) :
 	m_msg(msg)
 {
 
 }
 
-const std::string sg::exceptions::SGException::what() const
+const std::wstring sg::exceptions::SGException::what() const
 {
 	return this->m_msg;
 }

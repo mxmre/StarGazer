@@ -1,58 +1,26 @@
 #include <iostream>
-#include "Window.h"
+#include "BaseGame.h"
 
 using namespace std;
 using namespace sg::utility;
 using namespace sg::core;
 using namespace sg::event_control;
+using namespace sg::math;
+class Game : public BaseGame
+{
+public:
+	Game(Window& wnd) : BaseGame(wnd){}
+private:
+	void MainGameProccess()
+	{
+
+	}
+};
 int main()
 {
-	sg::utility::Logger<char> logger(ILogger::LogType::Info, ILogger::LogFlags::StdOutput | ILogger::LogFlags::Timed);
-	Window app(WindowSetting(L"ױוככמף ֲמנכה!", 10, 10, 640, 480));
-	app.Run();
-	while (app.IsRunning())
-	{
-		Event* ev = Window::PopEvent();
-		if (ev != nullptr)
-		{
-			switch (ev->event_type)
-			{
-			case Event::EventType::WindowEvent:
-			{
-				WindowEvent* window_event = (WindowEvent*)ev;
-				logger.Print("WindowEvent catched");
-				switch (window_event->window_event_type)
-				{
-				case WindowEvent::WindowEventType::WindowDestroy:
-					
-					app.Close();
-					break;
-				default:
-					break;
-				}
-				break;
-			}
-			case Event::EventType::KeyEvent:
-			{
-				
-				KeyEvent* key_event = (KeyEvent*)ev;
-				if(key_event->key_down)
-					logger.Print("Key down: " + std::to_string(static_cast<int>(key_event->key_code)));
-				else
-					logger.Print("Key up: " + std::to_string(static_cast<int>(key_event->key_code)));
-				switch (key_event->key_code)
-				{
-				default:
-					break;
-				}
-				break;
-			}
-			default:
-				break;
-			}
-			Window::DeleteEvent(ev);
-		}
-		
-	}
-	return 0;
+	
+	Window app(WindowSetting(L"ױוככמף ֲמנכה!", Rect{ 10, 10, 640, 480 }));
+	Game g(app);
+
+	return g.Run();
 }

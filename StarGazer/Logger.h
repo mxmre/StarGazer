@@ -32,7 +32,7 @@ namespace sg
 			}
 			virtual void Print(lgstring msg)
 			{
-				ILogger::GLOBAL_LOGGER_MUTEX.lock();
+				
 				if (!(this->m_flags & ILogger::LogFlags::StdOutput)
 					&& !(this->m_flags & ILogger::LogFlags::FileOutput))
 				{
@@ -67,8 +67,9 @@ namespace sg
 
 
 					this->_RawPrint(msg);
-					ILogger::GLOBAL_LOGGER_MUTEX.unlock();
+					
 				}
+				
 			}
 		private:
 			
@@ -80,6 +81,7 @@ namespace sg
 
 			void _RawPrint(const lgstring& msg)
 			{
+				ILogger::GLOBAL_LOGGER_MUTEX.lock();
 				if (this->m_flags & ILogger::LogFlags::StdOutput)
 				{
 					this->_StdOutputPrint(msg);
@@ -91,6 +93,7 @@ namespace sg
 					ms_loggers_file << msg << std::endl;
 					ms_loggers_file.close();
 				}
+				ILogger::GLOBAL_LOGGER_MUTEX.unlock();
 			}
 			
 			

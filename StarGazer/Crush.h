@@ -15,6 +15,6 @@ namespace sg
 			StdError = 1,
 			LoggerError
 		};
-		void Crush(int crush_code, const std::string& msg);
+		void Crush(int crush_code, const std::wstring& msg);
 	}
 }

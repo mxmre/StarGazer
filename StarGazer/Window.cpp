@@ -23,21 +23,37 @@ LRESULT CALLBACK Window::WindowProccess(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     switch (uMsg)
     {
     case WM_DESTROY:
-        Window::EVENT_QUEUE.Push(new WindowEvent(WindowEvent::WindowEventType::WindowDestroy));
+        Window::EVENT_QUEUE.Push(new WindowEvent(WindowEventType::WindowDestroy));
         return 0;
     case WM_KEYDOWN:
     {
-        KeyEvent::KeyCode code = static_cast<KeyEvent::KeyCode>(wParam);
+        KeyCode code = static_cast<KeyCode>(wParam);
         Window::EVENT_QUEUE.Push(new KeyEvent(code, true));
         return 0;
     }
     case WM_KEYUP:
     {
-        KeyEvent::KeyCode code = static_cast<KeyEvent::KeyCode>(wParam);
+        KeyCode code = static_cast<KeyCode>(wParam);
         Window::EVENT_QUEUE.Push(new KeyEvent(code, false));
         return 0;
     }
+    case WM_MOUSEHOVER:
+    {
         
+        return 0;
+    }
+    case WM_MOUSELEAVE:
+    {
+
+        return 0;
+    }
+    case WM_MOUSEMOVE:
+    {
+        sg::math::Point2d screen_pos = { LOWORD(lParam), HIWORD(lParam) };
+        sg::math::Point2d window_pos = {0, 0};
+        Window::EVENT_QUEUE.Push(new MouseMoveEvent(screen_pos, window_pos));
+        return 0;
+    }
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -76,7 +92,7 @@ int Window::WindowProccessRun(WindowSetting& window)
             WS_OVERLAPPEDWINDOW,            // Window style
 
             // Size and position
-            window.m_pos_x, window.m_pos_y, window.m_width, window.m_height,
+            window.m_window_rect.x, window.m_window_rect.y, window.m_window_rect.w, window.m_window_rect.h,
 
             NULL,       // Parent window    
             NULL,       // Menu

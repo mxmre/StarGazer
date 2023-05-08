@@ -7,10 +7,10 @@ namespace sg
 		class SGException
 		{
 		public:
-			SGException(const std::string& msg);
-			const std::string what() const;
+			SGException(const std::wstring& msg);
+			const std::wstring what() const;
 		private:
-			std::string m_msg;
+			std::wstring m_msg;
 		};
 	}
 }

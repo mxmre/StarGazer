@@ -3,6 +3,7 @@
 #include <string>
 
 #include "EventQueue.h"
+#include "BasicMathTypes.h"
 namespace sg
 {
 	namespace core
@@ -12,12 +13,11 @@ namespace sg
 		{
 		public:
 			WindowSetting(const std::wstring& window_name,
-				uint32_t pos_x, uint32_t pos_y,
-				uint32_t width, uint32_t height);
+				const sg::math::Rect& window_rect);
 			bool IsCreated() const;
 			friend class Window;
 		private:
-			uint32_t m_width, m_height, m_pos_x, m_pos_y;
+			sg::math::Rect m_window_rect;
 			std::wstring m_window_name;
 
 			HWND m_hwnd;

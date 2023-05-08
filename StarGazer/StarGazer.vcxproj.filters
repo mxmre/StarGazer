@@ -46,6 +46,15 @@
     <Filter Include="Event Control\cpp">
       <UniqueIdentifier>{67bebe05-fd22-4069-8337-e73f5c076525}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{d2ea0a21-837c-4deb-b146-67fa83414289}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\cpp">
+      <UniqueIdentifier>{ba1917a1-2e4a-428b-bbd5-24cfdd1d7812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\headers">
+      <UniqueIdentifier>{dfd533f7-bf51-4b1c-9dcf-bfddf35be1e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DateTime.cpp">
@@ -73,6 +82,12 @@
       <Filter>Core\cpp</Filter>
     </ClCompile>
     <ClCompile Include="EventQueue.cpp">
+      <Filter>Event Control\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseGame.cpp">
+      <Filter>Core\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="InputControl.cpp">
       <Filter>Event Control\cpp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -109,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="EventQueue.h">
       <Filter>Event Control\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGame.h">
+      <Filter>Core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="InputControl.h">
+      <Filter>Event Control\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicMathTypes.h">
+      <Filter>Math\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

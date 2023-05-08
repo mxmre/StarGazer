@@ -7,7 +7,7 @@ namespace sg
 		class SGFatalException : public SGException
 		{
 		public:
-			SGFatalException(const std::string& msg) : SGException(msg){};
+			SGFatalException(const std::wstring& msg) : SGException(msg){};
 		};
 	}
 }
