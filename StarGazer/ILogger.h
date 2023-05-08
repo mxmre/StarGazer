@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <filesystem>
+#include <mutex>
 
 #include "DateTime.h"
 
@@ -33,13 +34,16 @@ namespace sg
 
 			explicit ILogger(const LogType log_type = ILogger::LogType::DefaultMessage,
 				uint32_t logger_flags = 0x7);
+			static void InitLogFileDirectory(const std::filesystem::path& path);
 		protected:
 			LogType m_log_type;
 			uint32_t m_flags;
 			
-			static const std::string LOGFILES_PATH;
-			static std::string ms_logfile_name;
+			static const std::string DEFAULT_LOGS_FILE_DIRECTORY;
+			static std::string LOGS_FILE_DIRECTORY;
+			static std::string LOGS_FILE_NAME;
 			static bool ms_static_element_is_init;
+			static std::mutex GLOBAL_LOGGER_MUTEX;
 		};
 	}
 }

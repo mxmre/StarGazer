@@ -32,6 +32,7 @@ namespace sg
 			}
 			virtual void Print(lgstring msg)
 			{
+				ILogger::GLOBAL_LOGGER_MUTEX.lock();
 				if (!(this->m_flags & ILogger::LogFlags::StdOutput)
 					&& !(this->m_flags & ILogger::LogFlags::FileOutput))
 				{
@@ -66,6 +67,7 @@ namespace sg
 
 
 					this->_RawPrint(msg);
+					ILogger::GLOBAL_LOGGER_MUTEX.unlock();
 				}
 			}
 		private:
@@ -84,7 +86,7 @@ namespace sg
 				}
 				if (this->m_flags & ILogger::LogFlags::FileOutput)
 				{
-					lgofstream ms_loggers_file(ILogger::ms_logfile_name, std::ios::app);
+					lgofstream ms_loggers_file(ILogger::LOGS_FILE_NAME, std::ios::app);
 					exceptions::FatalErrorAssert(ms_loggers_file.is_open(), DEBUG_MSG("Log file cannot open!"));
 					ms_loggers_file << msg << std::endl;
 					ms_loggers_file.close();

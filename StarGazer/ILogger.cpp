@@ -2,16 +2,29 @@
 
 using namespace sg::utility;
 
-const std::string ILogger::LOGFILES_PATH = "logs";
-std::string ILogger::ms_logfile_name;
+const std::string ILogger::DEFAULT_LOGS_FILE_DIRECTORY = "logs";
+
+std::string ILogger::LOGS_FILE_DIRECTORY = "";
+std::string ILogger::LOGS_FILE_NAME;
+std::mutex ILogger::GLOBAL_LOGGER_MUTEX;
 
 ILogger::ILogger(const LogType log_type,
 	uint32_t logger_flags) : m_flags{ logger_flags }, m_log_type{ log_type }
 {
-	if (ILogger::ms_logfile_name.empty())
+	if (ILogger::LOGS_FILE_NAME.empty())
 	{
-		ILogger::ms_logfile_name = ILogger::LOGFILES_PATH + "\\" +
+		std::string logs_directory;
+		if(ILogger::LOGS_FILE_DIRECTORY.empty())	logs_directory = ILogger::DEFAULT_LOGS_FILE_DIRECTORY;
+		else										logs_directory = ILogger::LOGS_FILE_DIRECTORY;
+			
+		ILogger::LOGS_FILE_NAME = logs_directory + "\\" +
 			DateTime::DateTimeToUniqueString(DateTime::Now()) + ".log";
-		std::filesystem::create_directory(ILogger::LOGFILES_PATH);
+		if(!logs_directory.empty())
+			std::filesystem::create_directory(ILogger::DEFAULT_LOGS_FILE_DIRECTORY);
 	}
+}
+
+void sg::utility::ILogger::InitLogFileDirectory(const std::filesystem::path& path)
+{
+	ILogger::LOGS_FILE_DIRECTORY = path.string();
 }
