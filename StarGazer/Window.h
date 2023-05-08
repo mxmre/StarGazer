@@ -1,29 +1,34 @@
 #pragma once
-#include <Windows.h>
-#include <string>
+#include <thread>
+#include <chrono>
+#include "WindowSetting.h"
+#include "Logger.h"
 
-#include "EventQueue.h"
 namespace sg
 {
 	namespace core
 	{
-		class Application;
 		class Window
 		{
 		public:
-			Window(const std::wstring& window_name,
-				uint32_t pos_x, uint32_t pos_y,
-				uint32_t width, uint32_t height);
-			bool IsCreated() const;
-			friend class Application;
-		private:
-			uint32_t m_width, m_height, m_pos_x, m_pos_y;
-			std::wstring m_window_name;
+			Window(const WindowSetting& wnd);
+			~Window();
+			void Run();
+			bool IsRunning() const;
+			void Close();
 
-			HWND m_hwnd;
-			static const std::wstring WINDOW_CLASS_NAME;
+			static sg::event_control::Event* PopEvent();
+			static void DeleteEvent(sg::event_control::Event* ev);
+		private:
+			bool m_is_running;
+			WindowSetting m_window_setting;
+			sg::utility::Logger<wchar_t> m_app_info_logger, m_app_warn_logger, m_app_error_logger;
+
+			static int WindowProccessRun(WindowSetting& window);
+			static LRESULT WindowProccess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+			static sg::event_control::EventQueue EVENT_QUEUE;
 		};
+
 	}
 }
-
 

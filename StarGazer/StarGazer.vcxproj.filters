@@ -66,10 +66,10 @@
     <ClCompile Include="ILogger.cpp">
       <Filter>Utility\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
+    <ClCompile Include="WindowSetting.cpp">
       <Filter>Core\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="Window.cpp">
       <Filter>Core\cpp</Filter>
     </ClCompile>
     <ClCompile Include="EventQueue.cpp">
@@ -98,10 +98,10 @@
     <ClInclude Include="ILogger.h">
       <Filter>Utility\headers</Filter>
     </ClInclude>
-    <ClInclude Include="Window.h">
+    <ClInclude Include="WindowSetting.h">
       <Filter>Core\headers</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
+    <ClInclude Include="Window.h">
       <Filter>Core\headers</Filter>
     </ClInclude>
     <ClInclude Include="Events.h">

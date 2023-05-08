@@ -129,7 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Window.cpp" />
     <ClCompile Include="Asserts.cpp" />
     <ClCompile Include="Crush.cpp" />
     <ClCompile Include="DateTime.cpp" />
@@ -137,10 +137,10 @@
     <ClCompile Include="ILogger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SGException.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WindowSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
+    <ClInclude Include="Window.h" />
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Crush.h" />
     <ClInclude Include="DateTime.h" />
@@ -150,7 +150,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="SGException.h" />
     <ClInclude Include="SGFatalException.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="WindowSetting.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

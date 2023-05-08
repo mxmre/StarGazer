@@ -176,7 +176,8 @@ namespace sg
 
 				KEY_MAX = 0x100
 			}const key_code;
-			KeyEvent(const KeyCode key_code) : Event(Event::EventType::KeyEvent), key_code(key_code) {};
+			const bool key_down;
+			KeyEvent(const KeyCode key_code, const bool key_down) : Event(Event::EventType::KeyEvent), key_code(key_code), key_down(key_down) {};
 			
 		};
 		struct MouseEvent : Event

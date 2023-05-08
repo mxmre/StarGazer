@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Application.h"
+#include "Window.h"
 
 using namespace std;
 using namespace sg::utility;
@@ -8,12 +8,11 @@ using namespace sg::event_control;
 int main()
 {
 	sg::utility::Logger<char> logger(ILogger::LogType::Info, ILogger::LogFlags::StdOutput | ILogger::LogFlags::Timed);
-	Window* window = new Window(L"Õåëëîó Âîðëä!", 10, 10, 640, 480);
-	Application app(window);
+	Window app(WindowSetting(L"Õåëëîó Âîðëä!", 10, 10, 640, 480));
 	app.Run();
 	while (app.IsRunning())
 	{
-		Event* ev = Application::PopEvent();
+		Event* ev = Window::PopEvent();
 		if (ev != nullptr)
 		{
 			switch (ev->event_type)
@@ -37,8 +36,10 @@ int main()
 			{
 				
 				KeyEvent* key_event = (KeyEvent*)ev;
-
-				logger.Print("Key pressed: " + std::to_string(static_cast<int>(key_event->key_code)));
+				if(key_event->key_down)
+					logger.Print("Key down: " + std::to_string(static_cast<int>(key_event->key_code)));
+				else
+					logger.Print("Key up: " + std::to_string(static_cast<int>(key_event->key_code)));
 				switch (key_event->key_code)
 				{
 				default:
@@ -49,7 +50,7 @@ int main()
 			default:
 				break;
 			}
-			Application::DeleteEvent(ev);
+			Window::DeleteEvent(ev);
 		}
 		
 	}
