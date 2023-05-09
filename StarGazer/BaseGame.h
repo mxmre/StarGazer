@@ -13,6 +13,7 @@ namespace sg
 
 		protected:
 			virtual void MainGameProccess() = 0;
+			virtual void WindowEventListen(sg::event_control::Event* ev, std::thread& window_thread);
 			Window& m_main_window;
 			sg::utility::Logger<wchar_t> m_game_info_logger, m_game_warn_logger, m_game_error_logger;
 			sg::event_control::InputControl m_input_control;

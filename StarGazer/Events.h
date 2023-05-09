@@ -201,7 +201,7 @@ namespace sg
 			MouseEvent(MouseEventType const mouse_event_type,
 				const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) :
 				Event(EventType::MouseEvent), mouse_event_type (mouse_event_type),
-				MousePosition(screen_pos, window_pos) {};
+				MousePosition(screen_pos, window_pos){};
 
 		};
 		struct MouseMoveEvent : MouseEvent

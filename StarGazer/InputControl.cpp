@@ -24,6 +24,7 @@ void sg::event_control::InputControl::MouseMoveListen(Event* ev)
 	switch (mouse_ev->mouse_event_type)
 	{
 	case MouseEventType::MouseMove:
+		this->m_mouse_in_window_rect = true;
 		break;
 	case MouseEventType::MouseLeave:
 		this->m_mouse_in_window_rect = false;
@@ -36,8 +37,8 @@ void sg::event_control::InputControl::MouseMoveListen(Event* ev)
 	}
 	
 	this->m_mouse_position = MousePosition(*mouse_ev);
-	this->m_input_control_info_logger.Print("Mouse coord: " + std::to_string(this->m_mouse_position.screen_pos.x) +
-		"; " + std::to_string(this->m_mouse_position.screen_pos.y));
+	this->m_input_control_info_logger.Print("Mouse coord: " + std::to_string(this->m_mouse_position.window_pos.x) +
+		"; " + std::to_string(this->m_mouse_position.window_pos.y));
 }
 
 void sg::event_control::InputControl::EventListen(Event* ev)

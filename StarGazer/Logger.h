@@ -37,7 +37,7 @@ namespace sg
 					&& !(this->m_flags & ILogger::LogFlags::FileOutput))
 				{
 					Logger<char> logger(Logger::LogType::Warning);
-					logger.Print("A try to print message in unknown stream");
+					logger.Print("Logger: a try to print message in unknown stream");
 				}
 				else
 				{
@@ -89,9 +89,12 @@ namespace sg
 				if (this->m_flags & ILogger::LogFlags::FileOutput)
 				{
 					lgofstream ms_loggers_file(ILogger::LOGS_FILE_NAME, std::ios::app);
-					exceptions::FatalErrorAssert(ms_loggers_file.is_open(), DEBUG_MSG("Log file cannot open!"));
-					ms_loggers_file << msg << std::endl;
-					ms_loggers_file.close();
+					if (ms_loggers_file.is_open())
+					{
+						ms_loggers_file << msg << std::endl;
+						ms_loggers_file.close();
+					}
+					else { Logger<char> logger(Logger::LogType::Warning); logger.Print("Logger: unable to open file for writing"); }
 				}
 				ILogger::GLOBAL_LOGGER_MUTEX.unlock();
 			}

@@ -19,7 +19,7 @@ private:
 int main()
 {
 	
-	Window app(WindowSetting(L"ױוככמף ֲמנכה!", Rect{ 10, 10, 640, 480 }));
+	Window app(WindowSetting(L"ױוככמף ֲמנכה!", 1000, 600));
 	Game g(app);
 
 	return g.Run();

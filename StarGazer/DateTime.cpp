@@ -77,7 +77,7 @@ void DateTime::PassDateTime(const time_t secs, const time_t mins, const time_t h
 
 uint32_t DateTime::Year() const
 {
-	return this->m_year + 1;
+	return this->m_year;
 }
 
 uint32_t DateTime::Month() const

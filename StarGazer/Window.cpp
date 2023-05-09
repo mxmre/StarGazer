@@ -23,7 +23,9 @@ LRESULT CALLBACK Window::WindowProccess(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     switch (uMsg)
     {
     case WM_DESTROY:
+        
         Window::EVENT_QUEUE.Push(new WindowEvent(WindowEventType::WindowDestroy));
+        PostQuitMessage(0);
         return 0;
     case WM_KEYDOWN:
     {
@@ -44,13 +46,15 @@ LRESULT CALLBACK Window::WindowProccess(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     }
     case WM_MOUSELEAVE:
     {
-
+        sg::math::Point2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
+        sg::math::Point2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
+        Window::EVENT_QUEUE.Push(new MouseLeaveEvent(screen_pos, window_pos));
         return 0;
     }
     case WM_MOUSEMOVE:
     {
-        sg::math::Point2d screen_pos = { LOWORD(lParam), HIWORD(lParam) };
-        sg::math::Point2d window_pos = {0, 0};
+        sg::math::Point2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
+        sg::math::Point2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
         Window::EVENT_QUEUE.Push(new MouseMoveEvent(screen_pos, window_pos));
         return 0;
     }
@@ -68,6 +72,10 @@ Window::Window(const WindowSetting& wnd) : m_window_setting(wnd), m_is_running(f
 {
     this->m_app_info_logger.Print(L"Application init...");
 }
+WindowSetting& Window::GetWindowSettings()
+{
+    return this->m_window_setting;
+}
 int Window::WindowProccessRun(WindowSetting& window)
 {
     sg::utility::Logger<wchar_t> thread_run_info_logger(ILogger::LogType::Info);
@@ -76,9 +84,12 @@ int Window::WindowProccessRun(WindowSetting& window)
     if (true)
     {
         thread_run_info_logger.Print(L"Window class create...");
-        WNDCLASS wc = { };
+        WNDCLASS wc = { 0 };
 
         wc.lpfnWndProc = Window::WindowProccess;
+        wc.style = CS_HREDRAW | CS_VREDRAW;
+        wc.hCursor = LoadCursor(0, IDC_ARROW);
+        wc.hbrBackground = (HBRUSH)GetStockObject(static_cast<int>(window.m_bg_color));
         wc.lpszClassName = WindowSetting::WINDOW_CLASS_NAME.c_str();
 
         thread_run_info_logger.Print(L"Window class register...");
@@ -89,7 +100,7 @@ int Window::WindowProccessRun(WindowSetting& window)
             0,                              // Optional window styles.
             WindowSetting::WINDOW_CLASS_NAME.c_str(),                     // Window class
             window.m_window_name.c_str(),    // Window text
-            WS_OVERLAPPEDWINDOW,            // Window style
+            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,            // Window style
 
             // Size and position
             window.m_window_rect.x, window.m_window_rect.y, window.m_window_rect.w, window.m_window_rect.h,
@@ -117,28 +128,17 @@ int Window::WindowProccessRun(WindowSetting& window)
             DispatchMessage(&msg);
         }
 
-
+        thread_run_info_logger.Print(L"Window close.");
     }
     return 0;
 }
-void Window::Run()
-{
-    if (!this->IsRunning())
-    {
-        this->m_app_info_logger.Print(L"Application start running...");
-        this->m_is_running = true;
-        std::thread get_msg_thread(Window::WindowProccessRun, std::ref(this->m_window_setting));
-        get_msg_thread.detach();
-    }
-    
-}
+
 void Window::Close()
 {
-    if (!this->IsRunning())
+    if (this->IsRunning())
     {
         this->m_app_info_logger.Print(L"Application close...");
         this->m_is_running = false;
-        PostQuitMessage(0);
     }
 }
 Window::~Window()

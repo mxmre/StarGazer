@@ -10,30 +10,41 @@ BaseGame::BaseGame(Window& main_window) : m_main_window(main_window),
 	m_game_warn_logger(ILogger::LogType::Warning),
 	m_game_error_logger(ILogger::LogType::Error)
 {
-
+	this->m_main_window.GetWindowSettings().HideCursor();
+	ShowCursor(FALSE);
+}
+void BaseGame::WindowEventListen(Event* ev, std::thread& window_thread)
+{
+	if (ev != nullptr && ev->event_type == EventType::WindowEvent)
+	{
+		WindowEvent* w_ev = reinterpret_cast <WindowEvent*> (ev);
+		switch (w_ev->window_event_type)
+		{
+		case WindowEventType::WindowDestroy:
+			sg::exceptions::ErrorAssert(window_thread.joinable(), "Window thread is daemon proccess!");
+			window_thread.join();
+			this->m_main_window.Close();
+			break;
+		default:
+			break;
+		}
+	}
 }
 int BaseGame::Run()
 {
 	try
 	{
-		this->m_main_window.Run();
+		this->m_main_window.m_is_running = true;
+		std::thread window_thread(Window::WindowProccessRun, std::ref(this->m_main_window.m_window_setting));
+		
 		while (this->m_main_window.IsRunning())
 		{
 			Event* ev = Window::PopEvent();
-			if (ev != nullptr && ev->event_type == EventType::WindowEvent)
-			{
-				WindowEvent* w_ev = reinterpret_cast <WindowEvent*> (ev);
-				switch (w_ev->window_event_type)
-				{
-				case WindowEventType::WindowDestroy:
-					this->m_main_window.Close();
-					break;
-				default:
-					break;
-				}
-			}
 
-
+			/*ShowCursor(((this->m_input_control.MouseInWindowRect() && this->m_main_window.GetWindowSettings().CursorIsVisible())
+				|| !this->m_input_control.MouseInWindowRect()));*/
+			
+			this->WindowEventListen(ev, window_thread);
 			this->m_input_control.EventListen(ev);
 			this->MainGameProccess();
 
