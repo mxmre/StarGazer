@@ -1,9 +1,5 @@
 #pragma once
-#include <string>
-#include <fstream>
-#include <filesystem>
-
-#include <Windows.h>
+#include "stdafx.h"
 
 #include "DateTime.h"
 namespace sg

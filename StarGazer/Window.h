@@ -1,6 +1,5 @@
 #pragma once
-#include <thread>
-#include <chrono>
+#include "stdafx.h"
 #include "WindowSetting.h"
 #include "Logger.h"
 

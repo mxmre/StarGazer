@@ -90,6 +90,9 @@
     <ClCompile Include="InputControl.cpp">
       <Filter>Event Control\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Graphics\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateTime.h">
@@ -133,6 +136,18 @@
     </ClInclude>
     <ClInclude Include="BasicMathTypes.h">
       <Filter>Math\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Core\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Graphics\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="macros.h">
+      <Filter>Utility\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="utility_objects.h">
+      <Filter>Utility\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

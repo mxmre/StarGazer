@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include "stdafx.h"
 
 #include "Logger.h"
 #include "Events.h"

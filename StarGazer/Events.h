@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include "stdafx.h"
 #include "BasicMathTypes.h"
 namespace sg
 {
@@ -184,9 +184,9 @@ namespace sg
 		};
 		struct MousePosition
 		{
-			MousePosition(const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) : 
+			MousePosition(const sg::math::uPoint2d screen_pos, const sg::math::uPoint2d window_pos) : 
 				screen_pos(screen_pos), window_pos(window_pos) {}
-			sg::math::Point2d screen_pos, window_pos;
+			sg::math::uPoint2d screen_pos, window_pos;
 		};
 		enum class MouseEventType
 		{
@@ -199,24 +199,24 @@ namespace sg
 		{
 			MouseEventType const mouse_event_type;
 			MouseEvent(MouseEventType const mouse_event_type,
-				const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) :
+				const sg::math::uPoint2d screen_pos, const sg::math::uPoint2d window_pos) :
 				Event(EventType::MouseEvent), mouse_event_type (mouse_event_type),
 				MousePosition(screen_pos, window_pos){};
 
 		};
 		struct MouseMoveEvent : MouseEvent
 		{
-			MouseMoveEvent(const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) :
+			MouseMoveEvent(const sg::math::uPoint2d screen_pos, const sg::math::uPoint2d window_pos) :
 				MouseEvent(MouseEventType::MouseMove, screen_pos, window_pos)  {};
 		};
 		struct MouseLeaveEvent : MouseEvent
 		{
-			MouseLeaveEvent(const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) :
+			MouseLeaveEvent(const sg::math::uPoint2d screen_pos, const sg::math::uPoint2d window_pos) :
 				MouseEvent(MouseEventType::MouseLeave, screen_pos, window_pos) {};
 		};
 		struct MouseHowerEvent : MouseEvent
 		{
-			MouseHowerEvent(const sg::math::Point2d screen_pos, const sg::math::Point2d window_pos) :
+			MouseHowerEvent(const sg::math::uPoint2d screen_pos, const sg::math::uPoint2d window_pos) :
 				MouseEvent(MouseEventType::MouseHower, screen_pos, window_pos) {};
 		};
 		enum class WindowEventType

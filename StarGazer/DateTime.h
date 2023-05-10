@@ -1,11 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <string>
-#include <regex>
-#include <sstream>
-#include <ctime>
-#include <chrono>
-#include <iomanip>
+#include "stdafx.h"
 
 #include "Asserts.h"
 namespace sg

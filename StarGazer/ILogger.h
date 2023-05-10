@@ -1,7 +1,5 @@
 #pragma once
-#include <string>
-#include <filesystem>
-#include <mutex>
+#include "stdafx.h"
 
 #include "DateTime.h"
 

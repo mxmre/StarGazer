@@ -46,15 +46,15 @@ LRESULT CALLBACK Window::WindowProccess(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     }
     case WM_MOUSELEAVE:
     {
-        sg::math::Point2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
-        sg::math::Point2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
+        sg::math::uPoint2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
+        sg::math::uPoint2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
         Window::EVENT_QUEUE.Push(new MouseLeaveEvent(screen_pos, window_pos));
         return 0;
     }
     case WM_MOUSEMOVE:
     {
-        sg::math::Point2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
-        sg::math::Point2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
+        sg::math::uPoint2d screen_pos = { LOWORD(wParam), HIWORD(wParam) };
+        sg::math::uPoint2d window_pos = { LOWORD(lParam), HIWORD(lParam) };
         Window::EVENT_QUEUE.Push(new MouseMoveEvent(screen_pos, window_pos));
         return 0;
     }
@@ -103,7 +103,7 @@ int Window::WindowProccessRun(WindowSetting& window)
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,            // Window style
 
             // Size and position
-            window.m_window_rect.x, window.m_window_rect.y, window.m_window_rect.w, window.m_window_rect.h,
+            window.x, window.y, window.w, window.h,
 
             NULL,       // Parent window    
             NULL,       // Menu

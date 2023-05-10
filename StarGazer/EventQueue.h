@@ -1,6 +1,5 @@
 #pragma once
-#include <queue>
-#include <memory>
+#include "stdafx.h"
 #include "Events.h"
 
 namespace sg

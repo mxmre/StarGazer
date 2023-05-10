@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "stdafx.h"
 #include "SGException.h"
 #include "SGFatalException.h"
 #define DEBUG_MSG(text) (std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " + std::string((text)))

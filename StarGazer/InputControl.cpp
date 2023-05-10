@@ -3,7 +3,7 @@ using namespace sg::event_control;
 using namespace sg::math;
 using namespace sg::utility;
 
-sg::event_control::InputControl::InputControl() : m_mouse_position(Point2d{ 0,0 }, Point2d{ 0,0 }), m_mouse_in_window_rect(false),
+sg::event_control::InputControl::InputControl() : m_mouse_position(uPoint2d{ 0,0 }, uPoint2d{ 0,0 }), m_mouse_in_window_rect(false),
 	m_input_control_info_logger(ILogger::LogType::Info)
 {
 	this->m_keys_states.fill(false);
