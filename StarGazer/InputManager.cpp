@@ -1,16 +1,16 @@
-#include "InputControl.h"
+#include "InputManager.h"
 using namespace sg::event_control;
 using namespace sg::math;
 using namespace sg::utility;
 
-sg::event_control::InputControl::InputControl() : m_mouse_position(uPoint2d{ 0,0 }, uPoint2d{ 0,0 }), m_mouse_in_window_rect(false),
+sg::event_control::InputManager::InputManager() : m_mouse_position(uPoint2d{ 0,0 }, uPoint2d{ 0,0 }), m_mouse_in_window_rect(false),
 	m_input_control_info_logger(ILogger::LogType::Info)
 {
 	this->m_keys_states.fill(false);
 
 }
 
-void sg::event_control::InputControl::KeyInputListen(Event* ev)
+void sg::event_control::InputManager::KeyInputListen(Event* ev)
 {
 	KeyEvent* key_ev = reinterpret_cast<KeyEvent*>(ev);
 	bool new_key_state = false;
@@ -18,7 +18,7 @@ void sg::event_control::InputControl::KeyInputListen(Event* ev)
 	this->m_keys_states.at(static_cast<size_t>(key_ev->key_code)) = new_key_state;
 }
 
-void sg::event_control::InputControl::MouseMoveListen(Event* ev)
+void sg::event_control::InputManager::MouseMoveListen(Event* ev)
 {
 	MouseEvent* mouse_ev = reinterpret_cast<MouseMoveEvent*>(ev);
 	switch (mouse_ev->mouse_event_type)
@@ -41,35 +41,32 @@ void sg::event_control::InputControl::MouseMoveListen(Event* ev)
 		"; " + std::to_string(this->m_mouse_position.window_pos.y));
 }
 
-void sg::event_control::InputControl::EventListen(Event* ev)
+void sg::event_control::InputManager::EventListen(Event* ev)
 {
-	if (ev != nullptr)
+	switch (ev->event_type)
 	{
-		switch (ev->event_type)
-		{
-		case EventType::KeyEvent:
-			this->KeyInputListen(ev);
-			break;
-		case EventType::MouseEvent:
-			this->MouseMoveListen(ev);
-			break;
-		default:
-			break;
-		}
+	case EventType::KeyEvent:
+		this->KeyInputListen(ev);
+		break;
+	case EventType::MouseEvent:
+		this->MouseMoveListen(ev);
+		break;
+	default:
+		break;
 	}
 }
 
-bool sg::event_control::InputControl::KeyIsDown(const KeyCode key_code) const
+bool sg::event_control::InputManager::KeyIsDown(const KeyCode key_code) const
 {
 	return this->m_keys_states.at(static_cast<size_t>(key_code));
 }
 
-bool sg::event_control::InputControl::MouseInWindowRect() const
+bool sg::event_control::InputManager::MouseInWindowRect() const
 {
 	return this->m_mouse_in_window_rect;
 }
 
-MousePosition sg::event_control::InputControl::GetMousePosition() const
+MousePosition sg::event_control::InputManager::GetMousePosition() const
 {
 	return this->m_mouse_position;
 }

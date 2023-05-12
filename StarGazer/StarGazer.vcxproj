@@ -139,38 +139,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseGame.cpp" />
-    <ClCompile Include="InputControl.cpp" />
+    <ClCompile Include="BaseApplication.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Asserts.cpp" />
     <ClCompile Include="Crush.cpp" />
     <ClCompile Include="DateTime.cpp" />
-    <ClCompile Include="EventQueue.cpp" />
     <ClCompile Include="ILogger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SGException.cpp" />
     <ClCompile Include="WindowSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseGame.h" />
+    <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="BasicMathTypes.h" />
-    <ClInclude Include="InputControl.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="utility_objects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Crush.h" />
     <ClInclude Include="DateTime.h" />
-    <ClInclude Include="EventQueue.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="ILogger.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="SGException.h" />
     <ClInclude Include="SGFatalException.h" />
     <ClInclude Include="WindowSetting.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="StarGazer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,6 +26,7 @@ namespace sg
 				exceptions::FatalErrorAssert(loggers_file.is_open(), DEBUG_MSG("Log file cannot create!"));
 				loggers_file.close();*/
 			}
+			
 			virtual void Print(lgstring msg)
 			{
 				
@@ -67,6 +68,7 @@ namespace sg
 				}
 				
 			}
+			static Logger infoLogger, warnLogger, errorLogger;
 		private:
 			
 			void _StdOutputPrint(const lgstring& msg)
@@ -97,6 +99,9 @@ namespace sg
 			
 			
 		};
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::infoLogger(Logger<_CharType>::LogType::Info);
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::warnLogger(Logger<_CharType>::LogType::Warning);
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::errorLogger(Logger<_CharType>::LogType::Error);
 	}
 }
 

@@ -81,13 +81,10 @@
     <ClCompile Include="Window.cpp">
       <Filter>Core\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="EventQueue.cpp">
-      <Filter>Event Control\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseGame.cpp">
+    <ClCompile Include="BaseApplication.cpp">
       <Filter>Core\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="InputControl.cpp">
+    <ClCompile Include="InputManager.cpp">
       <Filter>Event Control\cpp</Filter>
     </ClCompile>
     <ClCompile Include="Render.cpp">
@@ -125,13 +122,10 @@
     <ClInclude Include="Events.h">
       <Filter>Event Control\headers</Filter>
     </ClInclude>
-    <ClInclude Include="EventQueue.h">
-      <Filter>Event Control\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseGame.h">
+    <ClInclude Include="BaseApplication.h">
       <Filter>Core\headers</Filter>
     </ClInclude>
-    <ClInclude Include="InputControl.h">
+    <ClInclude Include="InputManager.h">
       <Filter>Event Control\headers</Filter>
     </ClInclude>
     <ClInclude Include="BasicMathTypes.h">
@@ -149,5 +143,9 @@
     <ClInclude Include="utility_objects.h">
       <Filter>Utility\headers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="StarGazer.rc" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,6 @@
 #include "stdafx.h"
 
 #include "utility_objects.h"
-#include "EventQueue.h"
 #include "BasicMathTypes.h"
 namespace sg
 {
@@ -49,11 +48,11 @@ namespace sg
 			const HWND Handle() const;
 			void SetResolution(const uint32_t w, const uint32_t h);
 		private:
-			bool m_cursor_is_visible;
-			std::wstring m_window_name;
-			WindowBackgroundColor m_bg_color;
+			bool cursorIsVisible_;
+			std::wstring windowName_;
+			WindowBackgroundColor backgroundColor_;
 			/*CursorStyle m_cursor_style;*/
-			HWND m_hwnd;
+			HWND windowHandle_;
 			static const std::wstring WINDOW_CLASS_NAME;
 		};
 	}

@@ -68,13 +68,13 @@ int sg::graphics::Render::Init(sg::core::Window* window)
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));	// очищаем структуру
 	sd.BufferCount = 1;			// у нас один задний буфер
-	sd.BufferDesc.Width = this->m_window->GetWindowSettings().Width();		// устанавливаем ширину буфера
-	sd.BufferDesc.Height = this->m_window->GetWindowSettings().Height();		// устанавливаем высоту
+	sd.BufferDesc.Width = this->m_window->windowSetting.Width();		// устанавливаем ширину буфера
+	sd.BufferDesc.Height = this->m_window->windowSetting.Height();		// устанавливаем высоту
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // формат пикселя
 	sd.BufferDesc.RefreshRate.Numerator = 60; // частота обновления экрана
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // назначение буфера
-	sd.OutputWindow = this->m_window->GetWindowSettings().Handle();			// десктриптор окна
+	sd.OutputWindow = this->m_window->windowSetting.Handle();			// десктриптор окна
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;			// устанавливаем оконный режим
@@ -106,8 +106,8 @@ int sg::graphics::Render::Init(sg::core::Window* window)
 		return 0;
 	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, NULL);
 	D3D11_VIEWPORT vp;
-	vp.Width = (FLOAT)this->m_window->GetWindowSettings().Width();
-	vp.Height = (FLOAT)this->m_window->GetWindowSettings().Height();
+	vp.Width = (FLOAT)this->m_window->windowSetting.Width();
+	vp.Height = (FLOAT)this->m_window->windowSetting.Height();
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;

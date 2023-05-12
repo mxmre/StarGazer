@@ -7,11 +7,11 @@ namespace sg
 {
 	namespace event_control
 	{
-		class InputControl
+		class InputManager
 		{
 		public:
 
-			InputControl();
+			InputManager();
 			
 			void EventListen(Event* ev);
 
@@ -23,7 +23,7 @@ namespace sg
 			
 			bool m_mouse_in_window_rect;
 			static const size_t KEYS_STATES_SIZE = 0x100;
-			std::array<bool, InputControl::KEYS_STATES_SIZE> m_keys_states;
+			std::array<bool, InputManager::KEYS_STATES_SIZE> m_keys_states;
 
 			void KeyInputListen(Event* ev);
 			void MouseMoveListen(Event* ev);

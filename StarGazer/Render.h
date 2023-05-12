@@ -5,14 +5,14 @@ namespace sg
 {
 	namespace core
 	{
-		class BaseGame;
+		class BaseApplication;
 	}
 	namespace graphics
 	{
 		class Render
 		{
 		public:
-			friend class BaseGame;
+			friend class BaseApplication;
 			Render();
 			~Render();
 			void Swap();

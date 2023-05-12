@@ -1,15 +1,15 @@
 #include <iostream>
-#include "BaseGame.h"
+#include "BaseApplication.h"
 
 using namespace std;
 using namespace sg::utility;
 using namespace sg::core;
 using namespace sg::event_control;
 using namespace sg::math;
-class Game : public BaseGame
+class Game : public BaseApplication
 {
 public:
-	Game(Window& wnd) : BaseGame(wnd){}
+	Game(Window& wnd) : BaseApplication(wnd){}
 private:
 	void MainGameProccess()
 	{
