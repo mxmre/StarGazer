@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-#include "utility_objects.h"
+#include "BasicMathObjects.h"
 #include "BasicMathTypes.h"
 namespace sg
 {
@@ -32,7 +32,7 @@ namespace sg
 			White = WHITE_BRUSH,
 			Gray  = DKGRAY_BRUSH
 		};
-		class WindowSetting : public sg::utility::RectangularObject<uint32_t>
+		class WindowSetting : public sg::math::RectangularObject<uint32_t>
 		{
 		public:
 			WindowSetting(const std::wstring& window_name,

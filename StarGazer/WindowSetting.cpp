@@ -6,7 +6,7 @@ const std::wstring WindowSetting::WINDOW_CLASS_NAME = L"STARGAZER_DEF_WINDOW_CLA
 WindowSetting::WindowSetting(const std::wstring& window_name,
 	const uint32_t w, const uint32_t h,
 	const WindowBackgroundColor bg_color,
-	bool cursor_is_visible) : windowName_(window_name), sg::utility::RectangularObject<uint32_t>( 0,0, w, h ),
+	bool cursor_is_visible) : windowName_(window_name), sg::math::RectangularObject<uint32_t>( w, h ),
 	windowHandle_{ nullptr }, backgroundColor_{ bg_color },
 	cursorIsVisible_(cursor_is_visible)
 {

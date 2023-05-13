@@ -16,6 +16,11 @@ namespace sg
 			type x, y;
 		};
 		template<typename type>
+		struct tScale2d
+		{
+			type xScale, yScale;
+		};
+		template<typename type>
 		struct tRect
 		{
 			type x, y;
@@ -35,6 +40,11 @@ namespace sg
 		using uRect = tRect<uint32_t>;
 		using fRect = tRect<float>;
 		using dRect = tRect<double>;
+
+		using iScale2d = tScale2d<int32_t>;
+		using uScale2d = tScale2d<uint32_t>;
+		using fScale2d = tScale2d<float>;
+		using dScale2d = tScale2d<double>;
 	}
 
 }

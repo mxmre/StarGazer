@@ -154,11 +154,12 @@
   <ItemGroup>
     <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="BasicMathTypes.h" />
+    <ClInclude Include="GraphicalBaseObjects.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="utility_objects.h" />
+    <ClInclude Include="BasicMathObjects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Asserts.h" />
