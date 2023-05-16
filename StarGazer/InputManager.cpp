@@ -14,8 +14,17 @@ void sg::event_control::InputManager::KeyInputListen(Event* ev)
 {
 	KeyEvent* key_ev = reinterpret_cast<KeyEvent*>(ev);
 	bool new_key_state = false;
-	if (key_ev->key_down) new_key_state = true;
-	this->m_keys_states.at(static_cast<size_t>(key_ev->key_code)) = new_key_state;
+	size_t keyId = static_cast<size_t>(key_ev->key_code);
+	if (key_ev->key_down)
+	{
+		new_key_state = true;
+		sg::utility::Logger<char>::infoLogger.Print("Key down: " + std::to_string(keyId));
+	}
+	else
+	{
+		sg::utility::Logger<char>::infoLogger.Print("Key up: " + std::to_string(keyId));
+	}
+	this->m_keys_states.at(keyId) = new_key_state;
 }
 
 void sg::event_control::InputManager::MouseMoveListen(Event* ev)
@@ -37,8 +46,8 @@ void sg::event_control::InputManager::MouseMoveListen(Event* ev)
 	}
 	
 	this->m_mouse_position = MousePosition(*mouse_ev);
-	this->m_input_control_info_logger.Print("Mouse coord: " + std::to_string(this->m_mouse_position.window_pos.x) +
-		"; " + std::to_string(this->m_mouse_position.window_pos.y));
+	/*this->m_input_control_info_logger.Print("Mouse coord: " + std::to_string(this->m_mouse_position.window_pos.x) +
+		"; " + std::to_string(this->m_mouse_position.window_pos.y));*/
 }
 
 void sg::event_control::InputManager::EventListen(Event* ev)

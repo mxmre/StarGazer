@@ -73,15 +73,15 @@ namespace sg
 		{
 		public:
 			explicit Scalable2dObject(const _Type xScale = static_cast<_Type>(0), const _Type yScale = static_cast<_Type>(0)) : 
-				sg::math::tPoint2d<_Type>{ xScale, yScale } {}
+				sg::math::tScale2d<_Type>{ xScale, yScale } {}
 
 			virtual const _Type XScale() const
 			{
-				return this->x;
+				return this->xScale;
 			}
 			virtual const _Type YScale() const
 			{
-				return this->y;
+				return this->yScale;
 			}
 			virtual const sg::math::tScale2d<_Type> Scale2d() const
 			{

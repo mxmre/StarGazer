@@ -70,10 +70,17 @@ void Window::Run()
     
     if (!this->isRunning_)
     {
-        this->m_app_info_logger.Print(L"Window start...");
-        this->isRunning_ = true;
-        this->windowThread_ = new std::thread(Window::WindowProccessRun, std::ref(*this), std::ref(this->inputManager));
-        this->m_app_info_logger.Print(L"Window start success.");
+        if (this->pRender_ != nullptr)
+        {
+            this->m_app_info_logger.Print(L"Window start...");
+            
+            this->pWindowThread_ = new std::thread(&Window::WindowProccessRun, this);
+            this->m_app_info_logger.Print(L"Window start success.");
+        }
+        else
+        {
+            this->m_app_warn_logger.Print(L"Render not binded to window");
+        }
     }
     else
     {
@@ -85,24 +92,24 @@ bool Window::IsRunning() const
 {
     return this->isRunning_;
 }
-Window::Window(const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false), isClosed_(false),
-    windowThread_{nullptr},
+Window::Window(const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false), isClosed_(false), isWindowRunInterrupt_(false),
+    pWindowThread_{ nullptr }, pRender_{ nullptr },
     m_app_info_logger(ILogger::LogType::Info),
     m_app_warn_logger(ILogger::LogType::Warning),
     m_app_error_logger(ILogger::LogType::Error)
 {
     
 }
-int Window::WindowProccessRun(Window& window, sg::event_control::InputManager& inputManager)
+int Window::WindowProccessRun()
 {
-    window.m_app_info_logger.Print(L"Window init...");
+    this->m_app_info_logger.Print(L"Window init...");
     Logger<wchar_t>::infoLogger.Print(L"Window class create...");
     WNDCLASS wc = { 0 };
 
     wc.lpfnWndProc = Window::WindowMessageHandler;
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.hCursor = LoadCursor(0, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(static_cast<int>(window.windowSetting.backgroundColor_));
+    wc.hbrBackground = (HBRUSH)GetStockObject(static_cast<int>(this->windowSetting.backgroundColor_));
     wc.lpszClassName = WindowSetting::WINDOW_CLASS_NAME.c_str();
 
     Logger<wchar_t>::infoLogger.Print(L"Window class register...");
@@ -112,12 +119,12 @@ int Window::WindowProccessRun(Window& window, sg::event_control::InputManager& i
     HWND hwnd = CreateWindowEx(
         0,                              // Optional window styles.
         WindowSetting::WINDOW_CLASS_NAME.c_str(),                     // Window class
-        window.windowSetting.windowName_.c_str(),    // Window text
+        this->windowSetting.windowName_.c_str(),    // Window text
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,            // Window style
 
         // Size and position
-        window.windowSetting.x, window.windowSetting.y,
-        window.windowSetting.w, window.windowSetting.h,
+        this->windowSetting.x, this->windowSetting.y,
+        this->windowSetting.w, this->windowSetting.h,
 
         NULL,       // Parent window    
         NULL,       // Menu
@@ -130,7 +137,7 @@ int Window::WindowProccessRun(Window& window, sg::event_control::InputManager& i
         return 0;
     }
     Logger<wchar_t>::infoLogger.Print(L"Window create success!");
-    window.windowSetting.windowHandle_ = hwnd;
+    this->windowSetting.pWindow_ = hwnd;
 
     Logger<wchar_t>::infoLogger.Print(L"Window init success!");
     // Run the message loop.
@@ -138,49 +145,88 @@ int Window::WindowProccessRun(Window& window, sg::event_control::InputManager& i
     Logger<wchar_t>::infoLogger.Print(L"Showed window.");
     Logger<wchar_t>::infoLogger.Print(L"Start getting messages from window.");
     MSG msg = { };
-
+    this->isRunning_ = true;
+    /*BOOL bRet;*/
+    Window::windowIsInit.notify_one();
+    //while ((bRet = GetMessage(&msg, this->windowSetting.pWindow_, 0, 0)) != 0)
     while (msg.message != WM_QUIT)
     {
-        Event* pEvent = Window::PopEvent();
-        if (pEvent != nullptr)
+        if (!this->isRunning_)
         {
-            inputManager.EventListen(pEvent);
-            Logger<wchar_t>::infoLogger.Print(L"Event delete...");
-            delete pEvent;
-            Logger<wchar_t>::infoLogger.Print(L"Event deleted.");
+            this->isWindowRunInterrupt_ = true;
+            Logger<wchar_t>::infoLogger.Print(L"Window proccess interrupted.");
+            break;
         }
-
-        if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+        else
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            //if (bRet == -1)
+            //{
+            //    // handle the error and possibly exit
+            //    break;
+            //}
+            
+            if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+
+                Event* pEvent = Window::PopEvent();
+                if (pEvent != nullptr)
+                {
+                    inputManager.EventListen(pEvent);
+                    delete pEvent;
+                }
+            }
         }
     }
-    window.isRunning_ = false;
+    //std::unique_lock<std::mutex> locker(Window::_windowMutex);
+    
+    
     Logger<wchar_t>::infoLogger.Print(L"Window's handle message proccess ends.");
+    if (this->isWindowRunInterrupt_) 
+    {
+        Logger<wchar_t>::infoLogger.Print(L"Window's proccess interrupted.");
+        Window::windowProccessIsInterrupted_.notify_one();
+    }
+    this->Close();
+    
     return 0;
 }
 void Window::JoinWindowThread()
 {
-    if (this->windowThread_ != nullptr && this->windowThread_->joinable())
+    if (this->pWindowThread_ != nullptr && this->pWindowThread_->joinable())
     {
-        this->windowThread_->join();
+        this->pWindowThread_->join();
     }
         
+}
+void Window::BindRender(graphics::Render* pRender)
+{
+    this->pRender_ = pRender;
+    Logger<wchar_t>::infoLogger.Print(L"Render binded to window.");
+    if (!this->pRender_)
+        Logger<wchar_t>::warnLogger.Print(L"Render pointer is nullptr");
 }
 void Window::Close()
 {
     if (!this->isClosed_)
     {
-        this->m_app_info_logger.Print(L"Window close...");
-        if (this->windowThread_) delete this->windowThread_;
-        //if (this->windowSetting.windowHandle_) CloseWindow(this->windowSetting.windowHandle_);
-        this->m_app_info_logger.Print(L"Window closed");
         this->isClosed_ = true;
+        this->isRunning_ = false;
+        this->m_app_info_logger.Print(L"Window close...");
+        
+        if (this->isWindowRunInterrupt_)
+        {
+            std::unique_lock<std::mutex> locker(Window::windowMutex);
+            Window::windowProccessIsInterrupted_.wait(locker);
+        }
     }
-    
 }
 Window::~Window()
 {
     this->Close();
+    _DELETE(this->pWindowThread_);
 }
+
+std::mutex Window::windowMutex;
+std::condition_variable Window::windowProccessIsInterrupted_, Window::windowIsInit;

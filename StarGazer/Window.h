@@ -7,33 +7,43 @@
 
 namespace sg
 {
+	namespace graphics
+	{
+		class Render;
+	}
 	namespace core
 	{
-		class BaseApplication;
+
 		class Window
 		{
 		public:
+			
 			Window(const WindowSetting& wnd);
 			~Window();
 			bool IsRunning() const;
 			void Run();
-
-			friend class BaseApplication;
+			void Close();
 			
 			static sg::event_control::Event* PopEvent();
 			void JoinWindowThread();
 			sg::event_control::InputManager inputManager;
 			WindowSetting windowSetting;
+			void BindRender(graphics::Render* pRender);
+
+			static std::mutex windowMutex;
+			static std::condition_variable windowIsInit;
 		private:
-			void Close();
 			
-			static int WindowProccessRun(Window& window, sg::event_control::InputManager& inputManager);
+			
+			int WindowProccessRun();
 			static LRESULT WindowMessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 			static std::queue<sg::event_control::Event*> EVENT_QUEUE;
+			static std::condition_variable windowProccessIsInterrupted_;
 
-			bool isRunning_, isClosed_;
+			bool isRunning_, isClosed_, isWindowRunInterrupt_;
 			
-			std::thread* windowThread_;
+			std::thread* pWindowThread_;
+			sg::graphics::Render* pRender_;
 
 			sg::utility::Logger<wchar_t> m_app_info_logger, m_app_warn_logger, m_app_error_logger;
 		};

@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseApplication.cpp" />
+    <ClCompile Include="GraphicalBaseObjects.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -158,7 +159,6 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="macros.h" />
     <ClInclude Include="Render.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="BasicMathObjects.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Window.h" />
@@ -171,9 +171,6 @@
     <ClInclude Include="SGException.h" />
     <ClInclude Include="SGFatalException.h" />
     <ClInclude Include="WindowSetting.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="StarGazer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

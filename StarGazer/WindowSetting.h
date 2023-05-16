@@ -52,7 +52,7 @@ namespace sg
 			std::wstring windowName_;
 			WindowBackgroundColor backgroundColor_;
 			/*CursorStyle m_cursor_style;*/
-			HWND windowHandle_;
+			HWND pWindow_;
 			static const std::wstring WINDOW_CLASS_NAME;
 		};
 	}

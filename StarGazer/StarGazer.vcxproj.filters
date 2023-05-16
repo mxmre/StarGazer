@@ -90,6 +90,9 @@
     <ClCompile Include="Render.cpp">
       <Filter>Graphics\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicalBaseObjects.cpp">
+      <Filter>Graphics\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateTime.h">
@@ -140,15 +143,11 @@
     <ClInclude Include="macros.h">
       <Filter>Utility\headers</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="GraphicalBaseObjects.h">
       <Filter>Graphics\headers</Filter>
     </ClInclude>
     <ClInclude Include="BasicMathObjects.h">
       <Filter>Math\headers</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="StarGazer.rc" />
   </ItemGroup>
 </Project>

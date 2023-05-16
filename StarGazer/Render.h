@@ -1,33 +1,37 @@
 #pragma once
 #include "stdafx.h"
-#include "Window.h"
+#include "GraphicalBaseObjects.h"
 namespace sg
 {
 	namespace core
 	{
-		class BaseApplication;
+		class Window;
+		//class BaseApplication;
 	}
 	namespace graphics
 	{
 		class Render
 		{
 		public:
-			friend class BaseApplication;
+			//friend core::Window;
+			//friend void Bind(Window& refApplicationWindow, Render& refRender);
 			Render();
 			~Render();
-			void Swap();
-			void Draw();
-			void Close();
-
+			bool Init();
+			void ClearBuffers(const fColorRGBA color = {0.f, 0.f, 0.f, 0.f});
+			bool IsInit() const;
+			void BindWindow(core::Window* pWindow);
 		protected:
-			int Init(sg::core::Window* window);
-			sg::core::Window* m_window;
-			D3D_DRIVER_TYPE m_driverType;
-			D3D_FEATURE_LEVEL m_featureLevel;
-			ID3D11Device* m_pd3dDevice;
-			ID3D11DeviceContext* m_pImmediateContext;
-			IDXGISwapChain* m_pSwapChain;
-			ID3D11RenderTargetView* m_pRenderTargetView;
+			bool EnumerateAdapters();
+			std::vector <std::shared_ptr< IDXGIAdapter1 >> vAdapters_;
+			core::Window* pWindow_;
+
+			ID3D11Device* d3dDevice_;
+			ID3D11DeviceContext* d3dContext_;
+			IDXGISwapChain* swapChain_;
+			ID3D11RenderTargetView* backBufferTarget_;
+
+			D3D_FEATURE_LEVEL featureLevel_;
 		};
 	}
 }

@@ -7,7 +7,7 @@ WindowSetting::WindowSetting(const std::wstring& window_name,
 	const uint32_t w, const uint32_t h,
 	const WindowBackgroundColor bg_color,
 	bool cursor_is_visible) : windowName_(window_name), sg::math::RectangularObject<uint32_t>( w, h ),
-	windowHandle_{ nullptr }, backgroundColor_{ bg_color },
+	pWindow_{ nullptr }, backgroundColor_{ bg_color },
 	cursorIsVisible_(cursor_is_visible)
 {
 	
@@ -15,7 +15,7 @@ WindowSetting::WindowSetting(const std::wstring& window_name,
 
 bool WindowSetting::IsWindowCreated() const
 {
-	return this->windowHandle_ != nullptr;
+	return this->pWindow_ != nullptr;
 }
 
 void sg::core::WindowSetting::ShowCursor()
@@ -35,7 +35,7 @@ bool sg::core::WindowSetting::CursorIsVisible() const
 
 const HWND sg::core::WindowSetting::Handle() const
 {
-	return this->windowHandle_;
+	return this->pWindow_;
 }
 
 void sg::core::WindowSetting::SetResolution(const uint32_t w, const uint32_t h)

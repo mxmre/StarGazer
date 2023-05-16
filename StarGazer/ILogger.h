@@ -33,9 +33,11 @@ namespace sg
 			explicit ILogger(const LogType log_type = ILogger::LogType::DefaultMessage,
 				uint32_t logger_flags = 0x7);
 			static void InitLogFileDirectory(const std::filesystem::path& path);
+			static const ILogger GetDebugLogger(const LogType log_type = ILogger::LogType::DefaultMessage);
 		protected:
 			LogType m_log_type;
 			uint32_t m_flags;
+			bool isDebug_;
 			
 			static const std::string DEFAULT_LOGS_FILE_DIRECTORY;
 			static std::string LOGS_FILE_DIRECTORY;

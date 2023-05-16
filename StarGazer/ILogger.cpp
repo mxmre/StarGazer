@@ -9,7 +9,7 @@ std::string ILogger::LOGS_FILE_NAME;
 std::mutex ILogger::GLOBAL_LOGGER_MUTEX;
 
 ILogger::ILogger(const LogType log_type,
-	uint32_t logger_flags) : m_flags{ logger_flags }, m_log_type{ log_type }
+	uint32_t logger_flags) : m_flags{ logger_flags }, m_log_type{ log_type }, isDebug_{false}
 {
 	if (ILogger::LOGS_FILE_NAME.empty())
 	{
@@ -27,4 +27,9 @@ ILogger::ILogger(const LogType log_type,
 void sg::utility::ILogger::InitLogFileDirectory(const std::filesystem::path& path)
 {
 	ILogger::LOGS_FILE_DIRECTORY = path.string();
+}
+
+const ILogger sg::utility::ILogger::GetDebugLogger(const LogType log_type)
+{
+	return ILogger(log_type);
 }

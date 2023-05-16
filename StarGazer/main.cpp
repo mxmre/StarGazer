@@ -6,11 +6,12 @@ using namespace sg::utility;
 using namespace sg::core;
 using namespace sg::event_control;
 using namespace sg::math;
-class Game : public BaseApplication
+using namespace sg::graphics;
+class Game : public sg::core::BaseApplication
 {
 public:
-	Game(Window& wnd) : BaseApplication(wnd){}
-private:
+	Game(Window& refApplicationWindow, sg::graphics::Render& refRender) : BaseApplication(refApplicationWindow, refRender){}
+protected:
 	void MainGameProccess()
 	{
 
@@ -18,9 +19,9 @@ private:
 };
 int main()
 {
-	
+	Render r;
 	Window app(WindowSetting(L"ױוככמף ֲמנכה!", 1000, 600));
-	Game g(app);
+	Game g(app, r);
 
 	return g.Run();
 }
