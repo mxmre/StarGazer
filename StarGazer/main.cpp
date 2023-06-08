@@ -1,5 +1,6 @@
 #include <iostream>
 #include "BaseApplication.h"
+#include "ThreadPool.h"
 
 using namespace std;
 using namespace sg::utility;
@@ -17,11 +18,44 @@ protected:
 
 	}
 };
+int foo0()
+{
+	Logger<char>::Info.Print("foo0 started");
+	while (!ThreadPool::ThisThread().IsInterrupted())
+	{
+	}
+	Logger<char>::Info.Print("foo0 ended");
+	return 1;
+}
+int foo1()
+{
+	Logger<char>::Info.Print("foo1");
+	Logger<char>::Info.Print("foo1 ended");
+	return 2;
+}
+int foo2()
+{
+	Logger<char>::Info.Print("foo2");
+	while (!ThreadPool::ThisThread().IsInterrupted())
+	{
+	}
+	Logger<char>::Info.Print("foo2 ended");
+	return 3;
+}
 int main()
 {
-	Render r;
+	int mainResult = 0;
+	/*Render r;
 	Window app(WindowSetting(L"ױוככמף ֲמנכה!", 1000, 600));
 	Game g(app, r);
-
-	return g.Run();
+	mainResult = g.Run();*/
+	sg::core::ThreadPool tp(3);
+	auto res0 = tp.AddTask(0, foo0);
+	auto res1 = tp.AddTask(1, foo1);
+	auto res2 = tp.AddTask(2, foo2);
+//	std::cout << res1.get();
+	tp.InterruptThread(0);
+	tp.InterruptThread(2);
+	//std::cout << res0.get() << res2.get();
+	return mainResult;
 }

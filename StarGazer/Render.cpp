@@ -5,15 +5,29 @@ using namespace sg::graphics;
 using namespace sg::core;
 using namespace sg::utility;
 
-sg::graphics::Render::Render() : pWindow_{nullptr}, d3dDevice_{ nullptr }, d3dContext_{ nullptr }, swapChain_{ nullptr },
+sg::graphics::Render::Render(const wchar_t* adapterName) : pWindow_{nullptr}, d3dDevice_{ nullptr }, d3dContext_{ nullptr }, swapChain_{ nullptr },
 backBufferTarget_{ nullptr }, featureLevel_{ D3D_FEATURE_LEVEL_11_0 }
 {
     this->EnumerateAdapters();
+    if (adapterName)
+    {
+        std::wstring wstrAdapterName(adapterName);
+        auto vAdaptersIterator = std::find_if(this->vAdapters_.begin(), this->vAdapters_.end(), [&wstrAdapterName](Render::Adapter& adapter)
+            {return std::wstring(adapter.dxgiAdapterDesc.Description) == wstrAdapterName; });
+        if (vAdaptersIterator != this->vAdapters_.end())
+        {
+
+        }
+        else
+        {
+
+        }
+    }
 }
 
 sg::graphics::Render::~Render()
 {
-    Logger<wchar_t>::infoLogger.Print(L"Render delete...");
+    Logger<wchar_t>::Info.Print(L"Render delete...");
     _RELEASE(this->d3dDevice_);
     _RELEASE(this->d3dContext_);
     _RELEASE(this->swapChain_);
@@ -26,7 +40,7 @@ bool sg::graphics::Render::Init()
     {
         return false;
     }
-    Logger<wchar_t>::infoLogger.Print(L"Render init start...");
+    Logger<wchar_t>::Info.Print(L"Render init start...");
     D3D_DRIVER_TYPE driverType_ = D3D_DRIVER_TYPE_HARDWARE;
     D3D_DRIVER_TYPE driverTypes[] =
     {
@@ -41,7 +55,7 @@ bool sg::graphics::Render::Init()
     D3D_FEATURE_LEVEL_10_0
     };
     unsigned int totalFeatureLevels = ARRAYSIZE(featureLevels);
-    Logger<wchar_t>::infoLogger.Print(L"Render devices create...");
+    Logger<wchar_t>::Info.Print(L"Render devices create...");
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
     swapChainDesc.BufferCount = 1;
@@ -79,7 +93,7 @@ bool sg::graphics::Render::Init()
     {
         return false;
     }
-    Logger<wchar_t>::infoLogger.Print(L"Render devices created.");
+    Logger<wchar_t>::Info.Print(L"Render devices created.");
     
     ID3D11Texture2D* backBufferTexture;
     result = this->swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D),
@@ -107,7 +121,7 @@ bool sg::graphics::Render::Init()
     this->d3dContext_->RSSetViewports(1, &viewport);
     
     this->ClearBuffers();
-    Logger<wchar_t>::infoLogger.Print(L"Render init end.");
+    Logger<wchar_t>::Info.Print(L"Render init end.");
     return true;
 }
 
@@ -130,9 +144,9 @@ bool sg::graphics::Render::IsInit() const
 void sg::graphics::Render::BindWindow(core::Window* pWindow)
 {
     this->pWindow_ = pWindow;
-    Logger<wchar_t>::infoLogger.Print(L"Window binded to render.");
+    Logger<wchar_t>::Info.Print(L"Window binded to render.");
     if (!this->pWindow_)
-        Logger<wchar_t>::warnLogger.Print(L"Window pointer is nullptr");
+        Logger<wchar_t>::Warn.Print(L"Window pointer is nullptr");
 }
 
 bool sg::graphics::Render::EnumerateAdapters()
@@ -152,19 +166,13 @@ bool sg::graphics::Render::EnumerateAdapters()
         pFactory->EnumAdapters1(i, &pAdapter) != DXGI_ERROR_NOT_FOUND;
         ++i)
     {
-        this->vAdapters_.push_back(std::shared_ptr<IDXGIAdapter1>(pAdapter, [](IDXGIAdapter1* pAdapter) 
-            { 
-                if (pAdapter)
-                {
-                    DXGI_ADAPTER_DESC1 a {};
-            
-                    pAdapter->GetDesc1(&a);
-                    std::wstring adapterDescription(a.Description);
-                    Logger<wchar_t>::infoLogger.Print(adapterDescription + L" adapter desc destroyed.");
-                    pAdapter->Release();
-                }
-                
-            }));
+        DXGI_ADAPTER_DESC1 dxgiAdapterDesc{};
+        pAdapter->GetDesc1(&dxgiAdapterDesc);
+        this->vAdapters_.push_back(Adapter{ std::shared_ptr<IDXGIAdapter1>(pAdapter, [](IDXGIAdapter1* pAdapter)
+            {
+                _RELEASE(pAdapter);
+
+            }),  dxgiAdapterDesc });
     }
 
 

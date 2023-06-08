@@ -35,15 +35,8 @@ int BaseApplication::Run()
 		sg::exceptions::ErrorAssert(this->refRender_.Init(), "Render init error!");
 		while (this->refApplicationWindow_.IsRunning())
 		{
-			if (color.g == 0xff) 
-			{
-				color.g = 0;
-			}
-			
-			
 			this->MainGameProccess();
 			this->refRender_.ClearBuffers(color);
-			++color.g;
 		}
 		this->Close();
 		return 0;

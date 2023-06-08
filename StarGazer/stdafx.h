@@ -17,8 +17,13 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <type_traits>
 
+#include <future>
 #include <algorithm>
+#include <functional>
+#include <condition_variable>
+#include <stdexcept>
 #include <chrono>
 
 #include <cmath>

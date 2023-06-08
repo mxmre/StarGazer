@@ -13,9 +13,14 @@ namespace sg
 		class Render
 		{
 		public:
+			struct Adapter
+			{
+				std::shared_ptr< IDXGIAdapter1 > dxgiAdapter;
+				DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
+			};
 			//friend core::Window;
 			//friend void Bind(Window& refApplicationWindow, Render& refRender);
-			Render();
+			Render(const wchar_t* adapterName = nullptr);
 			~Render();
 			bool Init();
 			void ClearBuffers(const fColorRGBA color = {0.f, 0.f, 0.f, 0.f});
@@ -23,7 +28,9 @@ namespace sg
 			void BindWindow(core::Window* pWindow);
 		protected:
 			bool EnumerateAdapters();
-			std::vector <std::shared_ptr< IDXGIAdapter1 >> vAdapters_;
+			
+			std::vector <Render::Adapter> vAdapters_;
+			
 			core::Window* pWindow_;
 
 			ID3D11Device* d3dDevice_;

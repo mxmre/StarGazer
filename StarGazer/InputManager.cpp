@@ -18,11 +18,11 @@ void sg::event_control::InputManager::KeyInputListen(Event* ev)
 	if (key_ev->key_down)
 	{
 		new_key_state = true;
-		sg::utility::Logger<char>::infoLogger.Print("Key down: " + std::to_string(keyId));
+		sg::utility::Logger<char>::Info.Print("Key down: " + std::to_string(keyId));
 	}
 	else
 	{
-		sg::utility::Logger<char>::infoLogger.Print("Key up: " + std::to_string(keyId));
+		sg::utility::Logger<char>::Info.Print("Key up: " + std::to_string(keyId));
 	}
 	this->m_keys_states.at(keyId) = new_key_state;
 }

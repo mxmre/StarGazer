@@ -29,46 +29,32 @@ namespace sg
 			
 			virtual void Print(lgstring msg)
 			{
-				
-				if (!(this->m_flags & ILogger::LogFlags::StdOutput)
-					&& !(this->m_flags & ILogger::LogFlags::FileOutput))
+				//types
+				std::string _warn("Warning: "), _info("Info: "), _error("Error: ");
+				switch (this->m_log_type)
 				{
-					Logger<char> logger(Logger::LogType::Warning);
-					logger.Print("Logger: a try to print message in unknown stream");
+				case LogType::Warning:
+					msg = lgstring(_warn.begin(), _warn.end()) + msg;
+					break;
+				case LogType::Info:
+					msg = lgstring(_info.begin(), _info.end()) + msg;
+					break;
+				case LogType::Error:
+					msg = lgstring(_error.begin(), _error.end()) + msg;
+					break;
+				case LogType::DefaultMessage:
+				default:
+					break;
 				}
-				else
+				//flags
+				if (this->m_flags & Logger::LogFlags::Timed)
 				{
-					//types
-					std::string _warn("Warning: "), _info("Info: "), _error("Error: ");
-					switch (this->m_log_type)
-					{
-					case LogType::Warning:
-						msg = lgstring(_warn.begin(), _warn.end()) + msg;
-						break;
-					case LogType::Info:
-						msg = lgstring(_info.begin(), _info.end()) + msg;
-						break;
-					case LogType::Error:
-						msg = lgstring(_error.begin(), _error.end()) + msg;
-						break;
-					case LogType::DefaultMessage:
-					default:
-						break;
-					}
-					//flags
-					if (this->m_flags & Logger::LogFlags::Timed)
-					{
-						std::string _time = "[" + DateTime::DateTimeToString(DateTime::Now()) + "] ";
-						msg = lgstring(_time.begin(), _time.end()) + msg;
-					}
-
-
-					this->_RawPrint(msg);
-					
+					std::string _time = "[" + DateTime::DateTimeToString(DateTime::Now()) + "] ";
+					msg = lgstring(_time.begin(), _time.end()) + msg;
 				}
-				
+				this->_RawPrint(msg);
 			}
-			static Logger infoLogger, warnLogger, errorLogger;
+			static Logger Info, Warn, Error;
 		private:
 			
 			void _StdOutputPrint(const lgstring& msg)
@@ -92,16 +78,15 @@ namespace sg
 						ms_loggers_file << msg << std::endl;
 						ms_loggers_file.close();
 					}
-					else { Logger<char> logger(Logger::LogType::Warning); logger.Print("Logger: unable to open file for writing"); }
 				}
 				ILogger::GLOBAL_LOGGER_MUTEX.unlock();
 			}
 			
 			
 		};
-		template<class _CharType> Logger<_CharType> Logger<_CharType>::infoLogger(Logger<_CharType>::LogType::Info);
-		template<class _CharType> Logger<_CharType> Logger<_CharType>::warnLogger(Logger<_CharType>::LogType::Warning);
-		template<class _CharType> Logger<_CharType> Logger<_CharType>::errorLogger(Logger<_CharType>::LogType::Error);
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::Info(Logger<_CharType>::LogType::Info);
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::Warn(Logger<_CharType>::LogType::Warning);
+		template<class _CharType> Logger<_CharType> Logger<_CharType>::Error(Logger<_CharType>::LogType::Error);
 	}
 }
 

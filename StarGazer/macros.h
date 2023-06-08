@@ -4,3 +4,14 @@
 #define _DELETE_ARRAY(p)	{ if(p){delete[] (p); (p)=nullptr;} }
 #define _RELEASE(p)		{ if(p){(p)->Release(); (p)=nullptr;} }
 #define _CLOSE(p)		{ if(p){(p)->Close(); delete (p); (p)=nullptr;} }
+#define _SG_TRY_START try {
+//#define _SG_TRY_END(SGExceptionCode, StdExceptionCode, DefaultCode) }	catch (const sg::exceptions::SGException& exc) \
+//					{SGExceptionCode;}\
+//					catch (const std::exception& exc) \
+//					{StdExceptionCode;}\
+//					catch (...) {DefaultCode;}
+#define _SG_TRY_END }	catch (const sg::exceptions::SGException& exc) \
+					{sg::utility::Logger<wchar_t>::Error.Print(exc.what());}\
+					catch (const std::exception& exc) \
+					{sg::utility::Logger<char>::Error.Print(exc.what());}\
+					catch (...) {sg::utility::Logger<char>::Error.Print("Unknown error catched!");}

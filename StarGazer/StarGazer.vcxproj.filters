@@ -93,6 +93,9 @@
     <ClCompile Include="GraphicalBaseObjects.cpp">
       <Filter>Graphics\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Core\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateTime.h">
@@ -148,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="BasicMathObjects.h">
       <Filter>Math\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Core\headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
