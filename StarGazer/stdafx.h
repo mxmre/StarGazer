@@ -18,6 +18,7 @@
 #include <thread>
 #include <mutex>
 #include <type_traits>
+#include <typeinfo>
 
 #include <future>
 #include <algorithm>

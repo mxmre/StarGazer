@@ -10,60 +10,64 @@ namespace sg
 		class ThreadPool
 		{
 		public:
-			struct Thread
+			class Thread
 			{
 			private:
-				friend ThreadPool;
-				
-
 				std::shared_ptr<std::thread> pThread;
 				
 				std::queue<std::function<void()>> tasksQueue;
-				std::mutex thisThreadMutex;
-				std::mutex mainThreadMutex;
-				std::condition_variable thisThreadCondition;
+				std::mutex waitMutex;
+				std::mutex variableChangeMutex;
+				std::condition_variable threadWait;
 				size_t globalThreadId;
 				enum class ThreadStatus
 				{
-					Null,
-					Idle,
-
 					Active,
 					Paused,
 					Interrupted,
-					Stoped
+					Stoped,
+					Closed
 				} threadStatus;
 				void InvokeThreadWaitInterrupt_(ThreadStatus status);
-			public:
-				Thread();
-				bool IsPaused() const;
+				bool InterruptWait() const;
 				bool IsInterrupted() const;
 				bool IsStoped() const;
-				bool IsActive() const;
-				void Pause();
-				void Unpause();
+				bool IsClosed() const;
+			public:
+				Thread();
+				friend ThreadPool;
+				bool IsPaused() const;
+				
+				bool IsExit() const;
 				inline std::thread::id GetId() const;
 			};
-
+			friend Thread;
 			ThreadPool(size_t threadCount);
 			~ThreadPool();
 			inline size_t ThreadsCount() const;
 			template <class _Fn, class... _Args,
-				typename _ReturnType = std::invoke_result_t<std::decay_t<_Fn>, std::decay_t<_Args>...>>
-			std::future<_ReturnType> AddTask(size_t threadId, _Fn&& _Fx, _Args&&... _Ax)
+				typename _ReturnFutureType = std::invoke_result_t<std::decay_t<_Fn>, std::decay_t<_Args>...>>
+			std::future<_ReturnFutureType> AddTask(size_t threadId, _Fn&& _Fx, _Args&&... _Ax)
 			{	
-				std::unique_lock<std::mutex> uLock(this->vThreads_[threadId].thisThreadMutex);
-				auto Task = std::make_shared< std::packaged_task<_ReturnType()> >(
+				/*{
+					std::unique_lock<std::mutex> ulCreateThreadsLocker(this->mCreateThreads_);
+					this->cvCreateThreads_.wait(ulCreateThreadsLocker, []() {return true; });
+				}*/
+				auto Task = std::make_shared<std::packaged_task<_ReturnFutureType()> >(
 					std::bind(std::forward<_Fn>(_Fx), std::forward<_Args>(_Ax)...)
 					);
-				std::future<_ReturnType> TaskResult = Task->get_future();
+				std::future<_ReturnFutureType> TaskResult = Task->get_future();
 				{
-					std::unique_lock<std::mutex> uLock(this->threadPoolMutex);
+					std::string strId = "{" + std::to_string(threadId) + "} ";
+					sg::utility::Logger<char>::Info.Print(strId + "A try access to add task in queue...");
+					std::lock_guard<std::mutex> queueAccessLocker
+						(this->vThreads_[threadId].variableChangeMutex);
+					sg::utility::Logger<char>::Info.Print(strId + "A try access to add task in queue is allowed!");
 					this->vThreads_[threadId].tasksQueue.push([Task]() {(*Task)(); });
 				}
 				std::string sGlobalThreadId = "{" + std::to_string(this->vThreads_[threadId].globalThreadId) + "} ";
 				sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread notified(Add task).");
-				this->vThreads_[threadId].thisThreadCondition.notify_one();
+				
 				return TaskResult;
 			}
 			void InterruptThread(size_t threadId);
@@ -74,16 +78,16 @@ namespace sg
 			static bool IsPoolThread(const std::thread::id& threadId);
 		private:
 			//size_t GetFreeThread();
-			static std::mutex _mainThreadMutex;
-			static std::condition_variable _mainThreadCondition;
 			static std::thread::id _mainThreadId;
 			static std::map<std::thread::id, Thread*> _mAllThreads;
 			
 			std::vector<Thread> vThreads_;
-			std::mutex threadPoolMutex;
-			std::condition_variable threadPoolConditionVar;
+
+			/*std::mutex mCreateThreads_;
+			std::condition_variable cvCreateThreads_;*/
 		};
 	}
 }
+
 
 

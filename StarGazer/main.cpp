@@ -20,26 +20,21 @@ protected:
 };
 int foo0()
 {
-	Logger<char>::Info.Print("foo0 started");
-	while (!ThreadPool::ThisThread().IsInterrupted())
+	while (!ThreadPool::ThisThread().IsExit())
 	{
+		//std::cout << "0";
 	}
-	Logger<char>::Info.Print("foo0 ended");
 	return 1;
 }
 int foo1()
 {
-	Logger<char>::Info.Print("foo1");
-	Logger<char>::Info.Print("foo1 ended");
 	return 2;
 }
 int foo2()
 {
-	Logger<char>::Info.Print("foo2");
-	while (!ThreadPool::ThisThread().IsInterrupted())
+	while (!ThreadPool::ThisThread().IsExit())
 	{
 	}
-	Logger<char>::Info.Print("foo2 ended");
 	return 3;
 }
 int main()
