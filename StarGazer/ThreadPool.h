@@ -47,6 +47,9 @@ namespace sg
 			void close_thread(size_t thread_id, bool ignore_task = false);
 			void interrupt_current_task(size_t thread_id);
 			static bool thread_is_interrupted();
+
+			static bool is_main_thread();
+			static bool is_pool_thread();
 			//friend this_pool_thread;
 		private:
 			struct thread_t
@@ -76,9 +79,7 @@ namespace sg
 			};
 			friend thread_t;
 			void close_thread_with_status(size_t thread_id, thread_t::thread_status status);
-			static bool IsMainThread();
-			static bool IsPoolThread();
-			static bool IsPoolThread(const std::thread::id& threadId);
+			static bool is_pool_thread(const std::thread::id& threadId);
 			//size_t GetFreeThread();
 			static std::thread::id _mainThreadId;
 			static std::map<std::thread::id, thread_t*> _all_pool_threads;
