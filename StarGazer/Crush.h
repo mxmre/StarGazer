@@ -1,16 +1,15 @@
 #pragma once
 #include "stdafx.h"
-
-#include "DateTime.h"
 namespace sg
 {
 	namespace exceptions
 	{
-		enum CrushCode
+		enum e_crush_code
 		{
-			StdError = 1,
-			LoggerError
+			Null = 0,
+			WindowClassAlreadyExist
 		};
 		void Crush(int crush_code, const std::wstring& msg);
+		void Crush(int crush_code, const std::string& msg);
 	}
 }

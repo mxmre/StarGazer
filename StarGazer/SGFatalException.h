@@ -8,7 +8,10 @@ namespace sg
 		class SGFatalException : public SGException
 		{
 		public:
-			SGFatalException(const std::wstring& msg) : SGException(msg){};
+			SGFatalException(const std::wstring& msg, int code) : SGException(msg), _code{code} {};
+			int code() const { return this->_code; }
+		protected:
+			int _code;
 		};
 	}
 }

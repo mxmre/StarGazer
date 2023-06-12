@@ -18,7 +18,7 @@ namespace sg
 		{
 		public:
 			
-			Window(const WindowSetting& wnd);
+			Window(const std::wstring& window_class,const WindowSetting& wnd);
 			~Window();
 			bool IsRunning() const;
 			void Run();
@@ -44,7 +44,7 @@ namespace sg
 			
 			std::thread* pWindowThread_;
 			sg::graphics::Render* pRender_;
-
+			std::wstring _window_class_name;
 			sg::utility::Logger<wchar_t> m_app_info_logger, m_app_warn_logger, m_app_error_logger;
 		};
 

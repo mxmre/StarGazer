@@ -10,7 +10,9 @@
 //					catch (const std::exception& exc) \
 //					{StdExceptionCode;}\
 //					catch (...) {DefaultCode;}
-#define _SG_TRY_END }	catch (const sg::exceptions::SGException& exc) \
+#define _SG_TRY_END } catch (const sg::exceptions::SGFatalException& exc)\
+					{sg::utility::Logger<wchar_t>::Error.Print(exc.what());  sg::exceptions::Crush(exc.code(), exc.what());}\
+					catch (const sg::exceptions::SGException& exc) \
 					{sg::utility::Logger<wchar_t>::Error.Print(exc.what());}\
 					catch (const std::exception& exc) \
 					{sg::utility::Logger<char>::Error.Print(exc.what());}\

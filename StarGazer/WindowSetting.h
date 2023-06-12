@@ -53,7 +53,6 @@ namespace sg
 			WindowBackgroundColor backgroundColor_;
 			/*CursorStyle m_cursor_style;*/
 			HWND pWindow_;
-			static const std::wstring WINDOW_CLASS_NAME;
 		};
 	}
 }

@@ -9,12 +9,12 @@ namespace sg
 	{
 		void ErrorAssert(bool condition, const std::wstring& msg);
 		void Error(const std::wstring& msg);
-		void FatalErrorAssert(bool condition, const std::wstring& msg);
-		void FatalError(const std::wstring& msg);
+		void FatalErrorAssert(bool condition, const std::wstring& msg, int crush_code);
+		void FatalError(const std::wstring& msg, int crush_code);
 
 		void ErrorAssert(bool condition, const std::string& msg);
 		void Error(const std::string& msg);
-		void FatalErrorAssert(bool condition, const std::string& msg);
-		void FatalError(const std::string& msg);
+		void FatalErrorAssert(bool condition, const std::string& msg, int crush_code);
+		void FatalError(const std::string& msg, int crush_code);
 	}
 }

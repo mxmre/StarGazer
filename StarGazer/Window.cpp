@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Crush.h"
 using namespace sg::core;
 using namespace sg::utility;
 using namespace sg::event_control;
@@ -92,8 +93,8 @@ bool Window::IsRunning() const
 {
     return this->isRunning_;
 }
-Window::Window(const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false), isClosed_(false), isWindowRunInterrupt_(false),
-    pWindowThread_{ nullptr }, pRender_{ nullptr },
+Window::Window(const std::wstring& window_class, const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false), isClosed_(false), isWindowRunInterrupt_(false),
+    pWindowThread_{ nullptr }, pRender_{ nullptr }, _window_class_name(window_class),
     m_app_info_logger(ILogger::LogType::Info),
     m_app_warn_logger(ILogger::LogType::Warning),
     m_app_error_logger(ILogger::LogType::Error)
@@ -110,15 +111,18 @@ int Window::WindowProccessRun()
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.hCursor = LoadCursor(0, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(static_cast<int>(this->windowSetting.backgroundColor_));
-    wc.lpszClassName = WindowSetting::WINDOW_CLASS_NAME.c_str();
+    wc.lpszClassName = _window_class_name.c_str();
 
     Logger<wchar_t>::Info.Print(L"Window class register...");
-    RegisterClass(&wc);
+    
+    ATOM reg_result = RegisterClass(&wc);
+    sg::exceptions::FatalErrorAssert(!(!reg_result && GetLastError() == ERROR_CLASS_ALREADY_EXISTS), L"Window \"" +
+        _window_class_name + L"\" already exist!", sg::exceptions::e_crush_code::WindowClassAlreadyExist);
     Logger<wchar_t>::Info.Print(L"Window create...");
     // Create the window.
     HWND hwnd = CreateWindowEx(
         0,                              // Optional window styles.
-        WindowSetting::WINDOW_CLASS_NAME.c_str(),                     // Window class
+        _window_class_name.c_str(),                     // Window class
         this->windowSetting.windowName_.c_str(),    // Window text
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,            // Window style
 

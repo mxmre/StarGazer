@@ -1,8 +1,6 @@
 #include "WindowSetting.h"
 using namespace sg::core;
 
-const std::wstring WindowSetting::WINDOW_CLASS_NAME = L"STARGAZER_DEF_WINDOW_CLASS";
-
 WindowSetting::WindowSetting(const std::wstring& window_name,
 	const uint32_t w, const uint32_t h,
 	const WindowBackgroundColor bg_color,
