@@ -18,7 +18,9 @@ void tp::close_thread(size_t thread_id, bool ignore_tasks)
 bool tp::thread_is_interrupted()
 {
 	using ts = sg::core::ThreadPool::thread_t::thread_status;
-	sg::exceptions::ErrorAssert(tp::is_pool_thread(), "Trying to check the status on a thread outside the pool!");
+	
+	if (!tp::IsPoolThread())
+		return false;
 	std::thread::id current_thread_id = std::this_thread::get_id();
 	
 	if (tp::_all_pool_threads[current_thread_id]->interrupt_task_request_count)
@@ -96,7 +98,7 @@ tp::ThreadPool(size_t threadCount) : _threads(threadCount)
 			}
 		);
 		std::thread::id addThreadId = this->_threads[threadId].thread_ptr->get_id();
-		sg::exceptions::ErrorAssert(!tp::is_pool_thread(addThreadId), "Thread already exist.");
+		sg::exceptions::ErrorAssert(!tp::IsPoolThread(addThreadId), "Thread already exist.");
 		tp::_all_pool_threads[addThreadId] = &this->_threads[threadId];
 	}
 }
@@ -116,15 +118,15 @@ void tp::interrupt_current_task(size_t thread_id)
 	std::unique_lock<std::mutex> interrupt_locker(this->_threads[thread_id].variable_block_mutex);
 	++this->_threads[thread_id].interrupt_task_request_count;
 }
-bool tp::is_main_thread()
+bool tp::IsMainThread()
 {
 	return std::this_thread::get_id() == tp::_mainThreadId;
 }
-bool tp::is_pool_thread()
+bool tp::IsPoolThread()
 {
-	return tp::is_pool_thread(std::this_thread::get_id());
+	return tp::IsPoolThread(std::this_thread::get_id());
 }
-bool tp::is_pool_thread(const std::thread::id& threadId)
+bool tp::IsPoolThread(const std::thread::id& threadId)
 {
 	return tp::_all_pool_threads.find(threadId) != tp::_all_pool_threads.end();
 }
@@ -142,7 +144,7 @@ void tp::close_thread_with_status(size_t thread_id, tp::thread_t::thread_status 
 	case ts::stoped:
 		if (this->_threads[thread_id].v_thread_status != ts::closed)
 		{
-			sg::exceptions::ErrorAssert(tp::is_main_thread(),
+			sg::exceptions::ErrorAssert(tp::IsMainThread(),
 				"Trying to interrupt a pool thread not in the main thread");
 			this->_threads[thread_id].v_thread_status = status;
 			if (this->_threads[thread_id].thread_ptr->joinable())
