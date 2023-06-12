@@ -79,6 +79,8 @@ namespace sg
 			};
 			friend thread_t;
 			void close_thread_with_status(size_t thread_id, thread_t::thread_status status);
+			static bool is_main_thread();
+			static bool is_pool_thread();
 			static bool is_pool_thread(const std::thread::id& threadId);
 			//size_t GetFreeThread();
 			static std::thread::id _mainThreadId;
