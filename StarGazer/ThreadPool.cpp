@@ -1,71 +1,81 @@
 #include "ThreadPool.h"
-using namespace sg::core;
-sg::core::ThreadPool::Thread::Thread()
-	: threadStatus{ Thread::ThreadStatus::Active }, pThread(nullptr)
+using tp = sg::core::ThreadPool;
+std::thread::id tp::_mainThreadId;
+std::map<std::thread::id, tp::thread_t*> tp::_all_pool_threads;
+tp::thread_t::thread_t() : thread_ptr(nullptr), v_thread_status{ tp::thread_t::thread_status::active },
+	interrupt_task_request_count{0}
 {
-	static size_t globalThreadId = 0;
-	this->globalThreadId = globalThreadId++;
+	static size_t static_threads_id = 0;
+	this->thread_id_in_pools = static_threads_id++;
 }
-
-std::thread::id ThreadPool::_mainThreadId;
-std::map<std::thread::id, ThreadPool::Thread*> ThreadPool::_mAllThreads;
-void sg::core::ThreadPool::InterruptThread(size_t threadId)
+void tp::close_thread(size_t thread_id, bool ignore_tasks)
 {
-	this->vThreads_[threadId].InvokeThreadWaitInterrupt_(Thread::ThreadStatus::Interrupted);
+	using ts = sg::core::ThreadPool::thread_t::thread_status;
+	ts thread_status = ts::stoped;
+	if (ignore_tasks) thread_status = ts::interrupted;
+	this->close_thread_with_status(thread_id, thread_status);
 }
-void sg::core::ThreadPool::StopThread(size_t threadId)
+bool tp::thread_is_interrupted()
 {
-	this->vThreads_[threadId].InvokeThreadWaitInterrupt_(Thread::ThreadStatus::Stoped);
-}
-bool sg::core::ThreadPool::Thread::InterruptWait() const
-{
-	return ((!this->tasksQueue.empty() && this->threadStatus == Thread::ThreadStatus::Active)
-		|| this->threadStatus == Thread::ThreadStatus::Interrupted
-		|| this->threadStatus == Thread::ThreadStatus::Stoped);
-}
-sg::core::ThreadPool::ThreadPool(size_t threadCount) : vThreads_(threadCount)
-{
+	using ts = sg::core::ThreadPool::thread_t::thread_status;
 	
+	if (!tp::IsPoolThread())
+		return false;
+	std::thread::id current_thread_id = std::this_thread::get_id();
+	
+	if (tp::_all_pool_threads[current_thread_id]->interrupt_task_request_count)
+	{
+		std::unique_lock<std::mutex> interrupt_locker(tp::_all_pool_threads[current_thread_id]->variable_block_mutex);
+		--tp::_all_pool_threads[current_thread_id]->interrupt_task_request_count;
+		return true;
+	}
+	return (tp::_all_pool_threads[current_thread_id]->v_thread_status == ts::interrupted
+			|| tp::_all_pool_threads[current_thread_id]->v_thread_status == ts::stoped);
+
+}
+tp::ThreadPool(size_t threadCount) : _threads(threadCount)
+{
+	using ts = sg::core::ThreadPool::thread_t::thread_status;
 	sg::exceptions::ErrorAssert(threadCount, "The thread count is zero");
 	std::thread::id thisThreadId = std::this_thread::get_id();
-	if (ThreadPool::_mainThreadId != thisThreadId)
+	if (tp::_mainThreadId != thisThreadId)
 	{
-		if (ThreadPool::_mainThreadId != std::thread::id())
+		if (tp::_mainThreadId != std::thread::id())
 			sg::exceptions::Error("The thread pool was not created on the main thread");
-		else ThreadPool::_mainThreadId = thisThreadId;
+		else tp::_mainThreadId = thisThreadId;
 	}
 	for (size_t threadId = 0; threadId < threadCount; ++threadId)
 	{
-		
-		this->vThreads_[threadId].pThread = std::make_shared<std::thread>(
-			[](Thread& thisThread) -> void
+		thread_t& thread_ref = this->_threads[threadId];
+		thread_ref.thread_ptr = std::make_shared<std::thread>
+		(
+			[&thread_ref]() -> void
 			{
 				_SG_TRY_START
 
-				std::string sGlobalThreadId = "{" + std::to_string(thisThread.globalThreadId) + "} ";
+				std::string sGlobalThreadId = "{" + std::to_string(thread_ref.thread_id_in_pools) + "} ";
 				std::function<void()> task;
 				sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread created.");
 				for (;;)
 				{
 					{
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to wait...");
-						std::unique_lock<std::mutex> waitLocker(thisThread.waitMutex);
+						std::unique_lock<std::mutex> waitLocker(thread_ref.wait_mutex);
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to wait is allowed!");
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread waited new task or to be interrupt.");
-						thisThread.threadWait.wait(waitLocker, [&]() -> bool {
-							sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "task: " +
-								std::to_string(thisThread.tasksQueue.size()) + "; i: " + std::to_string(thisThread.threadStatus
-									== Thread::ThreadStatus::Interrupted) + "; s: " + std::to_string(thisThread.threadStatus
-										== Thread::ThreadStatus::Stoped));
-							return thisThread.InterruptWait(); });
+						thread_ref.cv_waiter.wait(waitLocker, [&]() -> bool {return
+							((!thread_ref.tasks_queue.empty() && thread_ref.v_thread_status == thread_t::thread_status::active)
+							|| thread_ref.v_thread_status == thread_t::thread_status::interrupted
+							|| thread_ref.v_thread_status == thread_t::thread_status::stoped); });
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread stop wait.");
 					}
 					{
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to thread status in cycle break...");
-						std::unique_lock<std::mutex> mainThreadAccessLocker(thisThread.variableChangeMutex);
+						std::unique_lock<std::mutex> mainThreadAccessLocker(thread_ref.variable_block_mutex);
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to thread status in cycle break is allowed!");
-						if (thisThread.IsInterrupted() ||
-							(thisThread.IsStoped() && thisThread.tasksQueue.empty()))
+						if (thread_ref.v_thread_status == thread_t::thread_status::interrupted ||
+							(thread_ref.v_thread_status == thread_t::thread_status::stoped &&
+								thread_ref.tasks_queue.empty()))
 						{
 							/*std::unique_lock<std::mutex> queueAccessLocker(thisThread.thisThreadMutex);
 							while (!thisThread.tasksQueue.empty()) thisThread.tasksQueue.pop();*/
@@ -73,9 +83,9 @@ sg::core::ThreadPool::ThreadPool(size_t threadCount) : vThreads_(threadCount)
 							break;
 						}
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread task get from queue...");
-						task = std::move(thisThread.tasksQueue.front());
+						task = std::move(thread_ref.tasks_queue.front());
 						sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread task pop from queue...");
-						thisThread.tasksQueue.pop();
+						thread_ref.tasks_queue.pop();
 					}
 					sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread task invoke started.");
 					task();
@@ -85,102 +95,68 @@ sg::core::ThreadPool::ThreadPool(size_t threadCount) : vThreads_(threadCount)
 
 				_SG_TRY_END
 
-			}, std::ref(this->vThreads_[threadId]));
-		std::thread::id addThreadId = this->vThreads_[threadId].pThread->get_id();
-		sg::exceptions::ErrorAssert(!ThreadPool::IsPoolThread(addThreadId), "Thread already exist.");
-		ThreadPool::_mAllThreads[addThreadId] = &this->vThreads_[threadId];
+			}
+		);
+		std::thread::id addThreadId = this->_threads[threadId].thread_ptr->get_id();
+		sg::exceptions::ErrorAssert(!tp::IsPoolThread(addThreadId), "Thread already exist.");
+		tp::_all_pool_threads[addThreadId] = &this->_threads[threadId];
 	}
 }
-sg::core::ThreadPool::~ThreadPool()
+tp::~ThreadPool()
 {
-	for (size_t threadId = 0; threadId < this->vThreads_.size(); ++threadId)
+	for (size_t threadId = 0; threadId < this->_threads.size(); ++threadId)
 	{
-		this->StopThread(0);
+		this->close_thread(threadId);
 	}
 }
-inline size_t sg::core::ThreadPool::ThreadsCount() const
+inline size_t tp::threads_count() const
 {
-	return this->vThreads_.size();
+	return this->_threads.size();
+}
+void tp::interrupt_current_task(size_t thread_id)
+{
+	std::unique_lock<std::mutex> interrupt_locker(this->_threads[thread_id].variable_block_mutex);
+	++this->_threads[thread_id].interrupt_task_request_count;
+}
+bool tp::IsMainThread()
+{
+	return std::this_thread::get_id() == tp::_mainThreadId;
+}
+bool tp::IsPoolThread()
+{
+	return tp::IsPoolThread(std::this_thread::get_id());
+}
+bool tp::IsPoolThread(const std::thread::id& threadId)
+{
+	return tp::_all_pool_threads.find(threadId) != tp::_all_pool_threads.end();
 }
 
-const sg::core::ThreadPool::Thread& sg::core::ThreadPool::ThisThread()
+void tp::close_thread_with_status(size_t thread_id, tp::thread_t::thread_status status)
 {
-	std::thread::id thisThreadId = std::this_thread::get_id();
-	if (ThreadPool::IsPoolThread(thisThreadId))
-		return *ThreadPool::_mAllThreads[thisThreadId];
-	sg::exceptions::Error("This thread not in thread pools");
-}
-inline std::thread::id sg::core::ThreadPool::Thread::GetId() const
-{
-	return this->pThread->get_id();
-}
-bool sg::core::ThreadPool::IsMainThread()
-{
-	return std::this_thread::get_id() == sg::core::ThreadPool::_mainThreadId;
-}
-bool sg::core::ThreadPool::IsPoolThread()
-{
-	return sg::core::ThreadPool::IsPoolThread(std::this_thread::get_id());
-}
-bool sg::core::ThreadPool::IsPoolThread(const std::thread::id& threadId)
-{
-	return ThreadPool::_mAllThreads.find(threadId) != ThreadPool::_mAllThreads.end();
-}
-bool sg::core::ThreadPool::Thread::IsPaused() const
-{
-	return this->threadStatus == sg::core::ThreadPool::Thread::ThreadStatus::Paused;
-}
-bool sg::core::ThreadPool::Thread::IsExit() const
-{
-	return this->threadStatus == sg::core::ThreadPool::Thread::ThreadStatus::Interrupted
-		|| this->threadStatus == sg::core::ThreadPool::Thread::ThreadStatus::Stoped;
-}
-bool sg::core::ThreadPool::Thread::IsInterrupted() const
-{
-	return this->threadStatus == 
-		sg::core::ThreadPool::Thread::ThreadStatus::Interrupted;
-}
-bool sg::core::ThreadPool::Thread::IsClosed() const
-{
-	return this->threadStatus ==
-		sg::core::ThreadPool::Thread::ThreadStatus::Closed;
-}
-bool sg::core::ThreadPool::Thread::IsStoped() const
-{
-	return this->threadStatus ==
-		sg::core::ThreadPool::Thread::ThreadStatus::Stoped;
-}
-void sg::core::ThreadPool::Thread::InvokeThreadWaitInterrupt_(ThreadStatus status)
-{
-	std::string sGlobalThreadId = "{" + std::to_string(this->globalThreadId) + "} ";
-	sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to interrupt or stop thread...");
-	std::unique_lock<std::mutex> statusLocker(this->variableChangeMutex);
-	sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "A try access to interrupt or stop thread is allowed!");
+	using ts = sg::core::ThreadPool::thread_t::thread_status;
+	std::string thread_id_in_pools_str = "{" + std::to_string(this->_threads[thread_id].thread_id_in_pools) + "} ";
+	sg::utility::Logger<char>::Info.Print(thread_id_in_pools_str + "A try access to interrupt or stop thread...");
+	std::unique_lock<std::mutex> ul_status_locker(this->_threads[thread_id].variable_block_mutex);
+	sg::utility::Logger<char>::Info.Print(thread_id_in_pools_str + "A try access to interrupt or stop thread is allowed!");
 	switch (status)
 	{
-	case ThreadStatus::Interrupted:
-	case ThreadStatus::Stoped:
-		if (!this->IsClosed() && (ThreadStatus::Interrupted == status 
-			|| ThreadStatus::Stoped == status))
+	case ts::interrupted:
+	case ts::stoped:
+		if (this->_threads[thread_id].v_thread_status != ts::closed)
 		{
-			sg::exceptions::ErrorAssert(sg::core::ThreadPool::IsMainThread(),
+			sg::exceptions::ErrorAssert(tp::IsMainThread(),
 				"Trying to interrupt a pool thread not in the main thread");
+			this->_threads[thread_id].v_thread_status = status;
+			if (this->_threads[thread_id].thread_ptr->joinable())
 			{
-				this->threadStatus = status;
-				
-				sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread notified(interrupt wait).");
+				sg::utility::Logger<char>::Info.Print(thread_id_in_pools_str + "Thread join...");
+				ul_status_locker.unlock();
+				this->_threads[thread_id].cv_waiter.notify_one();
+				this->_threads[thread_id].thread_ptr->join();
+				sg::utility::Logger<char>::Info.Print(thread_id_in_pools_str + "Thread successfull joined.");
 			}
-			if (this->pThread->joinable()) 
-			{
-				
-				std::string sGlobalThreadId = "{" + std::to_string(this->globalThreadId) + "} ";
-				sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread join...");
-				statusLocker.unlock();
-				this->pThread->join();
-				sg::utility::Logger<char>::Info.Print(sGlobalThreadId + "Thread successfull joined.");
-			}
-			ThreadPool::_mAllThreads.erase(this->pThread->get_id());
-			this->threadStatus = ThreadStatus::Closed;
+			tp::_all_pool_threads.erase(this->_threads[thread_id].thread_ptr->get_id());
+			this->_threads[thread_id].v_thread_status = ts::closed;
 		}
 	default:
 		return;
