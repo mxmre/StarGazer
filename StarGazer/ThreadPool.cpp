@@ -9,7 +9,7 @@ tp::thread_t::thread_t() : thread_ptr(nullptr), v_thread_status{ tp::thread_t::t
 	static size_t static_threads_id = 0;
 	this->thread_id_in_pools = static_threads_id++;
 }
-void tp::close_thread(size_t thread_id, bool ignore_tasks)
+void tp::close_thread(uint16_t thread_id, bool ignore_tasks)
 {
 	using ts = sg::core::ThreadPool::thread_t::thread_status;
 	ts thread_status = ts::stoped;
@@ -19,21 +19,21 @@ void tp::close_thread(size_t thread_id, bool ignore_tasks)
 bool tp::thread_is_interrupted()
 {
 	using ts = sg::core::ThreadPool::thread_t::thread_status;
-	
-	sg::exceptions::ErrorAssert(tp::is_pool_thread(), "Trying to check the status on a thread outside the pool!");
 	std::thread::id current_thread_id = std::this_thread::get_id();
+	sg::exceptions::ErrorAssert(tp::is_pool_thread(current_thread_id), "Trying to check the status on a thread outside the pool!");
+	tp::thread_t* thread_ptr = tp::_all_pool_threads[current_thread_id];
 	
-	if (tp::_all_pool_threads[current_thread_id]->interrupt_task_request_count)
+	if (thread_ptr->interrupt_task_request_count > 0)
 	{
-		std::unique_lock<std::mutex> interrupt_locker(tp::_all_pool_threads[current_thread_id]->variable_block_mutex);
-		--tp::_all_pool_threads[current_thread_id]->interrupt_task_request_count;
+		std::unique_lock<std::mutex> interrupt_locker(thread_ptr->variable_block_mutex);
+		--thread_ptr->interrupt_task_request_count;
 		return true;
 	}
-	return (tp::_all_pool_threads[current_thread_id]->v_thread_status == ts::interrupted
-			|| tp::_all_pool_threads[current_thread_id]->v_thread_status == ts::stoped);
+	return thread_ptr->v_thread_status == ts::interrupted
+			|| thread_ptr->v_thread_status == ts::stoped;
 
 }
-tp::ThreadPool(size_t threadCount) : _threads(threadCount)
+tp::ThreadPool(uint16_t threadCount) : _threads(threadCount)
 {
 	using ts = sg::core::ThreadPool::thread_t::thread_status;
 	sg::exceptions::ErrorAssert(threadCount, "The thread count is zero");
@@ -109,12 +109,13 @@ tp::~ThreadPool()
 		this->close_thread(threadId);
 	}
 }
-inline size_t tp::threads_count() const
+inline uint16_t tp::threads_count() const
 {
-	return this->_threads.size();
+	return static_cast<uint32_t>(this->_threads.size());
 }
-void tp::interrupt_current_task(size_t thread_id)
+void tp::interrupt_current_task(uint16_t thread_id)
 {
+	sg::utility::Logger<char>::Info.Print("Window create success!");
 	std::unique_lock<std::mutex> interrupt_locker(this->_threads[thread_id].variable_block_mutex);
 	++this->_threads[thread_id].interrupt_task_request_count;
 }
@@ -131,7 +132,7 @@ bool tp::is_pool_thread(const std::thread::id& threadId)
 	return tp::_all_pool_threads.find(threadId) != tp::_all_pool_threads.end();
 }
 
-void tp::close_thread_with_status(size_t thread_id, tp::thread_t::thread_status status)
+void tp::close_thread_with_status(uint16_t thread_id, tp::thread_t::thread_status status)
 {
 	using ts = sg::core::ThreadPool::thread_t::thread_status;
 	std::string thread_id_in_pools_str = "{" + std::to_string(this->_threads[thread_id].thread_id_in_pools) + "} ";

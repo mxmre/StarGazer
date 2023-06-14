@@ -11,12 +11,12 @@ namespace sg
 		{
 		public:
 			
-			ThreadPool(size_t thread_count);
+			ThreadPool(uint16_t thread_count);
 			~ThreadPool();
-			inline size_t threads_count() const;
+			inline uint16_t threads_count() const;
 			template <class _Fn, class... _Args,
 				typename _ReturnFutureType = std::invoke_result_t<std::decay_t<_Fn>, std::decay_t<_Args>...>>
-			std::future<_ReturnFutureType> add_task(size_t threadId, _Fn&& _Fx, _Args&&... _Ax)
+			std::future<_ReturnFutureType> add_task(uint16_t threadId, _Fn&& _Fx, _Args&&... _Ax)
 			{	
 				//std::future<_ReturnFutureType>
 				using ts = sg::core::ThreadPool::thread_t::thread_status;
@@ -44,8 +44,8 @@ namespace sg
 				return TaskResult;
 			}
 
-			void close_thread(size_t thread_id, bool ignore_task = false);
-			void interrupt_current_task(size_t thread_id);
+			void close_thread(uint16_t thread_id, bool ignore_task = false);
+			void interrupt_current_task(uint16_t thread_id);
 			static bool thread_is_interrupted();
 			static bool is_main_thread();
 			static bool is_pool_thread();
@@ -76,7 +76,7 @@ namespace sg
 				inline std::thread::id GetId() const;
 			};
 			friend thread_t;
-			void close_thread_with_status(size_t thread_id, thread_t::thread_status status);
+			void close_thread_with_status(uint16_t thread_id, thread_t::thread_status status);
 			
 			static bool is_pool_thread(const std::thread::id& threadId);
 			//size_t GetFreeThread();

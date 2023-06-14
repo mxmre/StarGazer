@@ -1,12 +1,12 @@
 #include "BaseApplication.h"
-
+#include "Crush.h"
 
 using namespace sg::core;
 using namespace sg::utility;
 using namespace sg::event_control;
 
-BaseApplication::BaseApplication(Window& refApplicationWindow, sg::graphics::Render& refRender)
-	: refApplicationWindow_(refApplicationWindow), refRender_(refRender),
+BaseApplication::BaseApplication(Window& refApplicationWindow, sg::graphics::Render& refRender, uint16_t thread_count)
+	: refApplicationWindow_(refApplicationWindow), refRender_(refRender), thread_pool_(thread_count),
 	m_game_info_logger(ILogger::LogType::Info),
 	m_game_warn_logger(ILogger::LogType::Warning),
 	m_game_error_logger(ILogger::LogType::Error)
@@ -16,54 +16,31 @@ BaseApplication::BaseApplication(Window& refApplicationWindow, sg::graphics::Ren
 }
 void BaseApplication::Close()
 {
-	this->refApplicationWindow_.Close();
-	
-	this->refApplicationWindow_.JoinWindowThread();
+	this->thread_pool_.close_thread(0);
 }
 int BaseApplication::Run()
 {
-	try
+	_SG_TRY_START
+	auto WindowInit = this->thread_pool_.add_task(0, &Window::Init, &this->refApplicationWindow_);
+	WindowInit.get();
+	auto RenderInit = this->thread_pool_.add_task(0, &sg::graphics::Render::Init, &this->refRender_);
+	sg::exceptions::ErrorAssert(RenderInit.get(), "Render init error!");
+	this->thread_pool_.add_task(0, &Window::Run, &this->refApplicationWindow_);
+	graphics::ColorRGBA8 color{ 0, 0, 0, 0 };
+	srand(0);
+	while (this->refApplicationWindow_.IsRunning())
 	{
-		this->refApplicationWindow_.Run();
-		{
-			std::unique_lock<std::mutex> locker(Window::windowMutex);
-			Window::windowIsInit.wait(locker);
-		}
-		graphics::ColorRGBA8 color{0, 0, 0, 0};
 
-		//while (!this->refApplicationWindow_.IsRunning());
-		sg::exceptions::ErrorAssert(this->refRender_.Init(), "Render init error!");
-		while (this->refApplicationWindow_.IsRunning())
-		{
-			this->MainGameProccess();
-			this->refRender_.ClearBuffers(color);
-		}
-		this->Close();
-		return 0;
+		this->MainGameProccess();
+		this->refRender_.ClearBuffers(color);
+		color.a = rand() % 256;
+		color.r = rand() % 256;
+		color.g = rand() % 256;
+		color.b = rand() % 256;
 	}
-	catch (sg::exceptions::SGFatalException& err)
-	{
-		this->Close();
-		this->m_game_error_logger.Print(err.what());
-		return 1;
-	}
-	catch (sg::exceptions::SGException& err)
-	{
-		this->Close();
-		this->m_game_error_logger.Print(err.what());
-		return 2;
-	}
-	catch (std::exception& err)
-	{
-		this->Close();
-		std::string err_msg = err.what();
-		this->m_game_error_logger.Print(std::wstring(err_msg.begin(), err_msg.end()));
-		return 3;
-	}
-	catch (...)
-	{
-		this->Close();
-		this->m_game_error_logger.Print(L"Unknown error!");
-		return 4;
-	}
+	this->Close();
+	return 0;
+	_SG_TRY_END
+	this->Close();
+	return 1;
 }

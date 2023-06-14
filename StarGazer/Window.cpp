@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Crush.h"
+#include "ThreadPool.h"
 using namespace sg::core;
 using namespace sg::utility;
 using namespace sg::event_control;
@@ -68,40 +69,22 @@ LRESULT CALLBACK Window::WindowMessageHandler(HWND hwnd, UINT uMsg, WPARAM wPara
 }
 void Window::Run()
 {
-    
-    if (!this->isRunning_)
-    {
-        if (this->pRender_ != nullptr)
-        {
-            this->m_app_info_logger.Print(L"Window start...");
-            
-            this->pWindowThread_ = new std::thread(&Window::WindowProccessRun, this);
-            this->m_app_info_logger.Print(L"Window start success.");
-        }
-        else
-        {
-            this->m_app_warn_logger.Print(L"Render not binded to window");
-        }
-    }
-    else
-    {
-        this->m_app_warn_logger.Print(L"Window already started");
-    }
-    
+    if (this->pRender_ != nullptr) this->Run_();
+    else this->m_app_warn_logger.Print(L"Render not binded to window");
 }
 bool Window::IsRunning() const
 {
     return this->isRunning_;
 }
-Window::Window(const std::wstring& window_class, const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false), isClosed_(false), isWindowRunInterrupt_(false),
-    pWindowThread_{ nullptr }, pRender_{ nullptr }, _window_class_name(window_class),
+Window::Window(const std::wstring& window_class, const WindowSetting& wnd) : windowSetting(wnd), isRunning_(false),
+pRender_{ nullptr }, _window_class_name(window_class),
     m_app_info_logger(ILogger::LogType::Info),
     m_app_warn_logger(ILogger::LogType::Warning),
     m_app_error_logger(ILogger::LogType::Error)
 {
     
 }
-int Window::WindowProccessRun()
+bool Window::Init()
 {
     this->m_app_info_logger.Print(L"Window init...");
     Logger<wchar_t>::Info.Print(L"Window class create...");
@@ -114,7 +97,7 @@ int Window::WindowProccessRun()
     wc.lpszClassName = _window_class_name.c_str();
 
     Logger<wchar_t>::Info.Print(L"Window class register...");
-    
+
     ATOM reg_result = RegisterClass(&wc);
     sg::exceptions::FatalErrorAssert(!(!reg_result && GetLastError() == ERROR_CLASS_ALREADY_EXISTS), L"Window \"" +
         _window_class_name + L"\" already exist!", sg::exceptions::e_crush_code::WindowClassAlreadyExist);
@@ -138,39 +121,34 @@ int Window::WindowProccessRun()
     if (hwnd == NULL)
     {
         Logger<wchar_t>::Info.Print(L"Window create failed!");
-        return 0;
+        return false;
     }
     Logger<wchar_t>::Info.Print(L"Window create success!");
     this->windowSetting.pWindow_ = hwnd;
-
+    this->isRunning_ = true;
     Logger<wchar_t>::Info.Print(L"Window init success!");
     // Run the message loop.
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+}
+int Window::Run_()
+{
+    
+    ShowWindow(this->windowSetting.pWindow_, SW_SHOWNORMAL);
     Logger<wchar_t>::Info.Print(L"Showed window.");
     Logger<wchar_t>::Info.Print(L"Start getting messages from window.");
     MSG msg = { };
-    this->isRunning_ = true;
+    
     /*BOOL bRet;*/
-    Window::windowIsInit.notify_one();
     //while ((bRet = GetMessage(&msg, this->windowSetting.pWindow_, 0, 0)) != 0)
     while (msg.message != WM_QUIT)
     {
         std::this_thread::sleep_for(5ms);
-        if (!this->isRunning_)
+        if (sg::core::ThreadPool::thread_is_interrupted())
         {
-            
-            this->isWindowRunInterrupt_ = true;
             Logger<wchar_t>::Info.Print(L"Window proccess interrupted.");
             break;
         }
         else
         {
-            //if (bRet == -1)
-            //{
-            //    // handle the error and possibly exit
-            //    break;
-            //}
-            
             if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
             {
                 TranslateMessage(&msg);
@@ -186,25 +164,9 @@ int Window::WindowProccessRun()
         }
     }
     //std::unique_lock<std::mutex> locker(Window::_windowMutex);
-    
-    
-    Logger<wchar_t>::Info.Print(L"Window's handle message proccess ends.");
-    if (this->isWindowRunInterrupt_) 
-    {
-        Logger<wchar_t>::Info.Print(L"Window's proccess interrupted.");
-        Window::windowProccessIsInterrupted_.notify_one();
-    }
     this->Close();
     
     return 0;
-}
-void Window::JoinWindowThread()
-{
-    if (this->pWindowThread_ != nullptr && this->pWindowThread_->joinable())
-    {
-        this->pWindowThread_->join();
-    }
-        
 }
 void Window::BindRender(graphics::Render* pRender)
 {
@@ -215,23 +177,12 @@ void Window::BindRender(graphics::Render* pRender)
 }
 void Window::Close()
 {
-    if (!this->isClosed_)
-    {
-        this->isClosed_ = true;
-        this->isRunning_ = false;
-        this->m_app_info_logger.Print(L"Window close...");
-        
-        if (this->isWindowRunInterrupt_)
-        {
-            std::unique_lock<std::mutex> locker(Window::windowMutex);
-            Window::windowProccessIsInterrupted_.wait(locker);
-        }
-    }
+    this->isRunning_ = false;
+    this->m_app_info_logger.Print(L"Window close...");
 }
 Window::~Window()
 {
-    this->Close();
-    _DELETE(this->pWindowThread_);
+    if(this->isRunning_) this->Close();
 }
 
 std::mutex Window::windowMutex;

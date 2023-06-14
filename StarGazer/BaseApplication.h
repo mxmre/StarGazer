@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Render.h"
 #include "InputManager.h"
+#include "ThreadPool.h"
 namespace sg
 {
 	namespace core
@@ -10,7 +11,7 @@ namespace sg
 		class BaseApplication
 		{
 		public:
-			BaseApplication(Window& refApplicationWindow, sg::graphics::Render& refRender);
+			BaseApplication(Window& refApplicationWindow, sg::graphics::Render& refRender, uint16_t thread_count);
 			int Run();
 
 		protected:
@@ -19,6 +20,7 @@ namespace sg
 			Window& refApplicationWindow_;
 			sg::graphics::Render& refRender_;
 			sg::utility::Logger<wchar_t> m_game_info_logger, m_game_warn_logger, m_game_error_logger;
+			sg::core::ThreadPool thread_pool_;
 		};
 	}
 }
